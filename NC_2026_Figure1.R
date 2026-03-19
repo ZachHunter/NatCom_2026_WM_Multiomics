@@ -16,7 +16,7 @@ library(kableExtra)
 #
 # This R Script includes code used to generate:
 #   Figure panel 1
-#   Supplemental Tables 1-2
+#   Supplemental Tables 1-3
 #
 # Special note - Uses r package bvt for ploting
 # Bioconductor visualization tools (bvt) is available at https://github.com/ZachHunter/bvt
@@ -220,7 +220,7 @@ exprs(studyTpM)[names(CXCR4HeatGenes),] %>%
   kbl(digits = 2,caption="Genes used in subtype identification by hierarchical clustering") %>%
   kable_classic() %>%
   column_spec(1,italic =TRUE) %>%
-  as_image(file = file.path(outputDir,"Figures/STables/Subtyped_Cluster_Genes.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST1_Subtyped_Cluster_Genes.pdf"),width = 6)
 
 
 ##############################
@@ -306,14 +306,14 @@ EWMvSubtyped[[1]] %>%
   column_spec(1,italic = T) %>%
   add_header_above(c("","Early WM (N=86)"=3,"Subtyped WM (N=163)"=3,"","")) %>%
   row_spec(which(EWMvSubtyped[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/EWM_vs_Subtyped_Clin1.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST2_EWM_vs_Subtyped_Clin1.pdf"),width = 6)
 
 EWMvSubtyped[[2]] %>%
   kbl(col.names = c("Early WM","Subtyped WM","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(EWMvSubtyped[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/EWM_vs_Subtyped_Clin2.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST2_EWM_vs_Subtyped_Clin2.pdf"),width = 6)
 
 
 BCLvPCL<-ClinTest(BCL,PCL)
@@ -323,14 +323,14 @@ BCLvPCL[[1]] %>%
   column_spec(1,italic = T) %>%
   add_header_above(c("","BCL Subtyped WM (N=96)"=3,"PCL Subtyped WM (N=67)"=3,"","")) %>%
   row_spec(which(BCLvPCL[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST2_BCL_vs_PCL_Clin1.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin1.png"),width = 6)
 
 BCLvPCL[[2]] %>%
   kbl(col.names = c("BCL Subtyped WM (N=96)","PCL Subtyped WM (N=67)","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(BCLvPCL[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST2_BCL_vs_PCL_Clin2.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin2.png"),width = 6)
 
 
 ClinTest(EWM,PCL)
