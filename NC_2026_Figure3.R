@@ -195,7 +195,7 @@ names(ImputedSubtype)<-names(MGUSvWM_PCL)
 ImputedSubtype[pData(MGUSvWM)[names(ImputedSubtype),"diagnosis:ch1"]=="IgMMGUS"]<-"IgM MGUS"
 ImputedSubtype[ImputedSubtype==1]<-"BCL"
 ImputedSubtype[ImputedSubtype==2]<-"PCL"
-ImputedSubtype<-factor(ImputedSubtype, levels=c("IgM MGUS", "PCL","BCL"))
+ImputedSubtype<-factor(ImputedSubtype, levels=c("IgM MGUS", "BCL","PCL"))
 pData(MGUSvWM)$Subtype<-ImputedSubtype
 
 # Ploting data
