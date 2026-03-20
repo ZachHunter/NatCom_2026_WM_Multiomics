@@ -27,8 +27,8 @@ library(GEOquery)
 ##############################
 
 #Set Input/Output directories
-dataDir<-"~/Desktop/DesktopData/Papers/Multiomics/Data/"
-outputDir<-"~/Desktop/DesktopData/Papers/Multiomics"
+dataDir<-"~/Path/to/Multiomics/Data/"
+outputDir<-"~/Path/to/Multiomics"
 
 #Loading eSets with relevant phenotype and feature data
 # ExpressionSet of gene level TpM data from salmon.
