@@ -7,6 +7,7 @@ library(survminer)
 library(destiny)
 library(broom)
 library(NMF)
+library(DESeq2)
 library(pheatmap)
 library(lubridate)
 library(kableExtra)
@@ -26,16 +27,14 @@ library(kableExtra)
 #============================#
 
 
-
-
 ##############################
 # File dependencies
 # Loading required files for analysis
 ##############################
 
 #Set Input/Output directories
-dataDir<-"~/Desktop/DesktopData/Papers/Multiomics/Data/"
-outputDir<-"~/Desktop/DesktopData/Papers/Multiomics"
+dataDir<-"~/Path/to/Directory/Data/"
+outputDir<-"~/Path/to/Directory/"
 
 #Loading eSets with relevant phenotype and feature data
 # ExpressionSet of gene level TpM data from salmon.
@@ -48,8 +47,6 @@ load(file.path(dataDir,"studyVST.RData"))
 #mSigDb data prepared for camera/fry analysis indexed for WMExpressed
 load(file.path(dataDir,"study_mSig.RData"))
 
-#All of the final patient mutations in MAF format and imported into maftools
-load(file.path(dataDir,"MAF.RData"))
 
 ##############################
 # Custom Functions
@@ -69,13 +66,6 @@ WMOnly<-sampleNames(studyCounts)[grep("WM", sampleNames(studyCounts))]
 # Counts used to determine power to detect differences, TpM used for biological relevance
 WMExpressed<-featureNames(studyCounts)[rowSums(counts(studyCounts)[,WMOnly]>10)>20]
 WMExpressed<-WMExpressed[rowSums(exprs(studyTpM)[WMExpressed,WMOnly] > 1) > 20]
-
-
-# Custom themes to make sure subtype colors remain the same across figures
-WMSubtypeColor<-c(3,1,2,4:9)
-WMHDSubtypeColor<-c(4,5,3,1,2,6:9)
-SubtypeTheme<-newNPTheme(npDefaultTheme, plotColors=list(points=npDefaultTheme$plotColors$points[WMSubtypeColor],fill=npDefaultTheme$plotColors$fill[WMSubtypeColor] ))
-HDWMTheme<-newNPTheme(npDefaultTheme, plotColors=list(points=npDefaultTheme$plotColors$points[WMHDSubtypeColor],fill=npDefaultTheme$plotColors$fill[WMHDSubtypeColor] ))
 
 #Testing clinical associations between groups
 ClinTest<-function(groupA,groupB) {
@@ -178,6 +168,7 @@ pheatmap(NMFPlotting[,2:3],
 )
 dev.off()
 
+                         
 ##############################
 # Figure 2C
 # 3D Rendering of Metagene Space
@@ -194,8 +185,7 @@ geneScatter(NMFPlotting,
             color=pData(studyTpM)[WMOnly,"SimpleSubtype"],
             theme=SubtypeTheme,legend=c("WM Subtype","BM (%)"),
             pointSize=.75,
-            main="",
-            RSOverride=TRUE)
+            main="")
 
 #Extract Features from NMF Model
 #Note that metagene 1 throws an error with the default Kim method
@@ -266,7 +256,6 @@ pData(studyCounts)<-pData(studyTpM)
 # Demonstration how NMF metagenes are restricted to a plane in 3D space
 ##############################
 
-
 #Making Supplementary Figure 1A
 #Note that this is made using a screenshot of RGL output
 pca1<-prcomp(scale(dmapData))
@@ -277,8 +266,7 @@ geneScatter(pca1$x[,1:3],
             theme=SubtypeTheme,
             useRgl=TRUE,
             main="",
-            legend=c("WM Subtype","EScore"),
-            RSOverride=TRUE)
+            legend=c("WM Subtype","EScore"))
 
 
 # Making Supplementary Figure 1B
@@ -337,8 +325,7 @@ geneScatter(NMFPlotting,
             color=pData(studyTpM)[WMOnly,"SimpleSubtype"],
             theme=SubtypeTheme,legend=c("WM Subtype","BM (%)"),
             pointSize=.75,
-            main="",
-            RSOverride=TRUE)
+            main="")
 
 
 ##############################
