@@ -18,7 +18,7 @@ library(kableExtra)
 #   Figure panel 1
 #   Supplemental Tables 1-3
 #
-# Special note - Uses r package bvt for ploting
+# Special note - Uses r package bvt for plotting
 # Bioconductor visualization tools (bvt) is available at https://github.com/ZachHunter/bvt
 # See readme.txt for more information.
 #============================#
@@ -32,8 +32,8 @@ library(kableExtra)
 ##############################
 
 #Set Input/Output directories
-dataDir<-"~/Desktop/DesktopData/Papers/Multiomics/Data/"
-outputDir<-"~/Desktop/DesktopData/Papers/Multiomics"
+dataDir<-"~/Path/to/Directory/Data/"
+outputDir<-"~/Path/to/Directory/"
 
 #Loading eSets with relevant phenotype and feature data
 # ExpressionSet of gene level TpM data from salmon.
@@ -130,14 +130,13 @@ pdf(file=file.path(outputDir,"Figures/Figure1/F1A_Oncoplot.pdf"), width = 10, he
 oncoplot(MYD88MAF, genes=c("MYD88","CD79B","CXCR4","ARID1A","BIRC3","EP300","BTG2","H1-4","TRAF2","CTBP1","NOTCH1","TP53","NDUFA7", "NOTCH2", "TNFAIP3"))
 dev.off()
 
+                         
 ##############################
 # Figure 1B
 # Stratifying samples on the CXCR4 mutant gene signature
 ##############################
 
-
 #Deriving CXCR4 DEG Signature
-
 CXCR4mod<-model.matrix(~ factor(CXCR4) + agebmbx + gender, data=pData(studyCounts)[WMOnly,])
 v<-voom(
   calcNormFactors(
@@ -160,7 +159,6 @@ CXCR4SigVST<-assay(studyVST)[rownames(CXCR4GeneSig),WMOnly] %>%
 #Clustering and visualization
 CXCR4Cluster<-kmeans(CXCR4SigVST, centers = 2,nstart = 20)$cluster
 
-
 CXCR4prcomp<-prcomp(CXCR4SigVST)
 pdf(file=file.path(outputDir,"Figures/Figure1/F1B_CXCR4Cluster.pdf"), width = 6, height = 4)
 
@@ -174,19 +172,20 @@ geneScatter(CXCR4prcomp$x[,1:2],
 genePlot(CXCR4prcomp$x[,1:2],plotType="density", drawPoints=F, add=TRUE, legendSize=0.00001,RSOverride=TRUE)
 dev.off()
 
+                         
 ##############################
 # Figure 1C
 # Heatmap of top PC1 genes
 # Includes creation of supplemental table 1
 ##############################
 
-#Selecting data for heatmap of top 50 PC1 genes
-CXCR4HeatGenes<-CXCR4prcomp$rotation[order(abs(CXCR4prcomp$rotation[,1]),decreasing = TRUE),1][1:50]
+#Selecting data for heatmap of top 120 PC1 genes
+CXCR4HeatGenes<-CXCR4prcomp$rotation[order(abs(CXCR4prcomp$rotation[,1]),decreasing = TRUE),1][1:120]
 
 #Note we are capturing the return value here so we can use cuttree to define the groups later
 pdf(file=file.path(outputDir,"Figures/Figure1/F1C_SubtypeHeatmap.pdf"), width = 5, height = 4)
 a<-pheatmap(scale(t(assay(studyVST)[names(CXCR4HeatGenes),WMOnly])),
-            clustering_method = "ward.D",
+            clustering_method = "ward.D2",
             cutree_rows = 3, cutree_cols = 2,
             show_colnames = FALSE, show_rownames = FALSE,
             annotation_row = data.frame(
@@ -241,15 +240,13 @@ v<-voom(
 )
 
 
-camera(v, study_mSig[[3]], design = subtypeMod, contrast = BCLvPCLcon)[c(4,6,8),] %>%
-  head(3) %>%
+camera(v, study_mSig[[3]], design = subtypeMod, contrast = BCLvPCLcon)[c(1,5,7,8),] %>%
   kbl(digits=c(0,0,20,20,20)) %>%
   kable_classic(full_width=FALSE)  %>%
   column_spec(1,italic = TRUE) %>%
   as_image(file = file.path(outputDir,"Figures/Figure1/F1D_PCLvBCL_GSEA1.pdf"),width = 6)
 
-camera(v, study_mSig[[8]], design = subtypeMod, contrast = BCLvPCLcon) %>%
-  head(7) %>%
+camera(v, study_mSig[[8]], design = subtypeMod, contrast = BCLvPCLcon)[c(1:3,5:6,9:10),] %>%
   kbl(digits=c(0,0,20,20,20)) %>%
   kable_classic(full_width=FALSE)  %>%
   column_spec(1,italic = TRUE) %>%
@@ -257,16 +254,12 @@ camera(v, study_mSig[[8]], design = subtypeMod, contrast = BCLvPCLcon) %>%
 
 
 
-
 ##############################
 # Figure 1E
 # Time to first therapy analysis by WM Subtype
-# Includes supplemental table 2  - Clinical Characterisics of Early WM
 ##############################
 
-
 #Time to first therapy analysis by subtype
-
 subtypeSuvData<-data.frame(
   pData(studyTpM)[WMOnly,c("TTFT","treated")],
   Subtype=pData(studyTpM)[WMOnly,"SimpleSubtype"],
@@ -284,13 +277,16 @@ ggsurvplot(
   ylab="Time to First Therapy",
   risk.table=T,
   xlab="Time (Years)",
+  palette =SubtypeTheme$plotColors$fill,
   conf.int = T)
 dev.off()
 
 
-
-##############
-#Subtype clinical comparisons
+##############################
+# Supplemental Tables 2-3
+# Clinical Characteristics of Early WM
+# Clinical Comparison of BCL vs. PCL
+##############################
 
 EWM<-WMOnly[pData(studyTpM)[WMOnly,"SimpleSubtype"]=="Early WM"]
 SubtypedWM<-WMOnly[pData(studyTpM)[WMOnly,"SimpleSubtype"]!="Early WM"]
@@ -323,14 +319,14 @@ BCLvPCL[[1]] %>%
   column_spec(1,italic = T) %>%
   add_header_above(c("","BCL Subtyped WM (N=96)"=3,"PCL Subtyped WM (N=67)"=3,"","")) %>%
   row_spec(which(BCLvPCL[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin1.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin1.pdf"),width = 6)
 
 BCLvPCL[[2]] %>%
   kbl(col.names = c("BCL Subtyped WM (N=96)","PCL Subtyped WM (N=67)","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(BCLvPCL[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin2.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin2.pdf"),width = 6)
 
 
 ClinTest(EWM,PCL)
