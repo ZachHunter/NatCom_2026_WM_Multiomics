@@ -29,8 +29,8 @@ library(DESeq2)
 ##############################
 
 #Set Input/Output directories
-dataDir<-"~/Path/to/Multiomics/Data/"
-outputDir<-"~/Path/to/Multiomics"
+dataDir<-"~/Path/to/Directory/Data/"
+outputDir<-"~/Path/to/Directory/"
 
 #Loading eSets with relevant phenotype and feature data
 # ExpressionSet of gene level TpM data from salmon.
