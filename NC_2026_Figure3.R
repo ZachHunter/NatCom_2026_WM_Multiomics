@@ -5,6 +5,7 @@ library(purrr)
 library(bvt)
 library(DESeq2)
 library(edgeR)
+library(lubridate)
 library(GEOquery)
 
 #============================#
@@ -27,8 +28,8 @@ library(GEOquery)
 ##############################
 
 #Set Input/Output directories
-dataDir<-"~/Path/to/Multiomics/Data/"
-outputDir<-"~/Path/to/Multiomics"
+dataDir<-"~/Path/to/Directory/Data/"
+outputDir<-"~/Path/to/Directory/"
 
 #Loading eSets with relevant phenotype and feature data
 # ExpressionSet of gene level TpM data from salmon.
