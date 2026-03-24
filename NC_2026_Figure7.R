@@ -84,6 +84,8 @@ genePlot(studyTpM,c("RAG1","MYB","IGLL1"),
          ylab="Transcripts per Million +1 (Log 2)",
          main="",
          legendSize=1.1,
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
          RSOverride=TRUE)
 dev.off()
 
@@ -96,6 +98,8 @@ genePlot(studyTpM,c("CD3E","CD8A","CD4"),
          ylab="Transcripts per Million +1 (Log 2)",
          main="",
          legendSize=1.1,
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
          RSOverride=TRUE)
 dev.off()
 
@@ -108,6 +112,8 @@ genePlot(studyTpM,c("CD33","FCGR3A","CD14"),
          ylab="Transcripts per Million +1 (Log 2)",
          main="",
          legendSize=1.1,
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
          RSOverride=TRUE)
 dev.off()
 
@@ -120,6 +126,8 @@ genePlot(studyTpM,c("CD34","KIT","PROM1"),
          ylab="Transcripts per Million +1 (Log 2)",
          main="",
          legendSize=1.1,
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
          RSOverride=TRUE)
 dev.off()
 
@@ -140,6 +148,11 @@ genePlot(studyTpM,
          legendSize=1.1,
          ylab="Transcripts per Million + 1 (Log 2 Scale)",
          main="",
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
+         groupLabelSpacing=1.8,
+         subgroupLabSize=.8,
+         subgroupLabelSpacing=.5,
          RSOverride=TRUE)
 dev.off()
 
@@ -188,8 +201,12 @@ dev.off()
 ##############################
 
 pdf(file=file.path(outputDir,"Figures/Figure7/F7D_MYD88VAF_HighP_EScore.pdf"), width = 5, height = 7)
-genePlot(MYD88f10$VAF, group=pData(studyTpM)[MYD88f10$ID,"EScore_5W"],
-         ylab="MYD88 VAF", main="",RSOverride=TRUE)
+genePlot(MYD88f10$VAF,
+         group=pData(studyTpM)[MYD88f10$ID,"EScore_5W"],
+         ylab="MYD88 VAF",
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
+         main="",RSOverride=TRUE)
 dev.off()
 
 
@@ -199,8 +216,12 @@ dev.off()
 ##############################
 
 pdf(file=file.path(outputDir,"Figures/Figure7/F7E_BM_HighP_EScore.pdf"), width = 4, height = 7)
-genePlot(pData(studyTpM)[MYD88f10$ID,"bm"], group=pData(studyTpM)[MYD88f10$ID,"EScore_EL"],
-         ylab="WM LPC BM Involvement (%)", axisText=c("","%"),
+genePlot(pData(studyTpM)[MYD88f10$ID,"bm"],
+         group=pData(studyTpM)[MYD88f10$ID,"EScore_EL"],
+         ylab="WM LPC BM Involvement (%)",
+         axisText=c("","%"),
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
          main="",RSOverride=TRUE)
 dev.off()
 
@@ -217,6 +238,8 @@ genePlot(studyTpM[,MYD88$ID], "S100A9",
          logScale=2,
          ylab="Transcrips per Million (Log 2 Scale)",
          logAdjustment=0,
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
          main="",RSOverride=TRUE)
 dev.off()
 
