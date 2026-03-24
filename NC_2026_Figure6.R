@@ -70,6 +70,7 @@ WMExpressed<-featureNames(studyCounts)[rowSums(counts(studyCounts)[,WMOnly]>10)>
 WMExpressed<-WMExpressed[rowSums(exprs(studyTpM)[WMExpressed,WMOnly] > 1) > 20]
 
 
+
 ##############################
 # Figure 6A
 # GSEA for Early/Late EScore
@@ -111,13 +112,13 @@ camera(v, study_mSig[[1]], design = EScoreMod, contrast = EScoreCon) %>%
 # Barcode plot for HALLMARK Inflamtoary Response with EScore
 ##############################
 
-pdf(file=file.path(outputDir,"Figures/Figure6/F6B_EScore_CameraIndex_Inflamatory.pdf"), width = 6, height = 3)
+pdf(file=file.path(outputDir,"Figures/Figure6/F6B_EScore_CameraIndex_Inflamatory.pdf"), width = 8, height = 4)
 barcodeplot(fit$t[,1],
             study_mSig[[1]]$HALLMARK_INFLAMMATORY_RESPONSE,
             design=EScoreMod,
             contrast=EScoreCon,
             main="Late vs Early EScore: HALLMARK - Inflamatory Response",
-            labels = "moderated t-statistic")
+            xlab = "moderated t-statistic")
 dev.off()
 
 
@@ -303,7 +304,13 @@ EScore_5W[pData(studyTpM)[WMOnly,"EScore"]>EScore_Cutoffs[2] & pData(studyTpM)[W
 EScore_5W[pData(studyTpM)[WMOnly,"EScore"]>EScore_Cutoffs[3] & pData(studyTpM)[WMOnly,"EScore"]<EScore_Cutoffs[4]]<-"ESL3"
 EScore_5W[pData(studyTpM)[WMOnly,"EScore"]>=EScore_Cutoffs[4] & pData(studyTpM)[WMOnly,"EScore"]<=EScore_Cutoffs[5]] <-"ESL4"
 
-png(file=file.path(outputDir,"Figures/SFigure4/SF4B_dmap_EScore_5W.png"),res = 300, units="in", width = 9, height = 7)
+
+##############################
+# Supplemental Figure 4D
+# Diffusion Map with EScore Level, Subtype and BM
+##############################
+
+pdf(file=file.path(outputDir,"Figures/SFigure4/SF4D_dmap_EScore_Levels_Subtype.pdf"), width = 9, height = 7)
 geneScatter(data.frame(DC1=dmapDpt$DC1,DC2=dmapDpt$DC2),
             color=EScore_5W,size=pData(studyTpM)[WMOnly,"bm"],
             shape=pData(studyTpM)[WMOnly,"SimpleSubtype"],
@@ -311,22 +318,6 @@ geneScatter(data.frame(DC1=dmapDpt$DC1,DC2=dmapDpt$DC2),
             main="",
             legendSize=1.1,
             RSOverride=TRUE)
-dev.off()
-
-
-##############################
-# Supplemental Figure 4D
-# Diffusion Map with EScore Level, Subtype and BM
-##############################
-
-pdf(file=file.path(outputDir,"Figures/SFigure4/SF4D_bm_EScore_5W.pdf"), width = 7, height = 7)
-genePlot(pData(studyTpM)[WMOnly,"bm"],
-         group=EScore_5W,
-         axisText=c("","%"),
-         main="",
-         ylab="WM LCP Bone Marrow Involvment",
-         subtitle="EScore Level",
-         RSOverride=TRUE)
 dev.off()
 
 
