@@ -41,8 +41,8 @@ load(file.path(dataDir,"studyVST.RData"))
 # loading the dmap model derived previously
 load(file=file.path(dataDir,"studyDmap.RData"))
 
-# All of the final patient mutations in MAF format. Again, very large
-load("~/Desktop/DesktopData/CurrentProjects/300/WES/MAF.RData")
+# All of the final patient mutations in MAF format.
+load("~/Path/to/Directory/WES/MAF.RData")
 
 
 ##############################
