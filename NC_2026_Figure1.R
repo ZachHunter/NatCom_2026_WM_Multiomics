@@ -45,7 +45,7 @@ load(file.path(dataDir,"studyCounts.RData"))
 load(file.path(dataDir,"study_mSig.RData"))
 
 #All of the final patient mutations in MAF format and imported into maftools
-load("~/Desktop/DesktopData/CurrentProjects/300/WES/MAF.RData")
+load(file.path(dataDir,"WES/MAF.RData"))
 
 ##############################
 # Custom Functions
@@ -130,13 +130,14 @@ pdf(file=file.path(outputDir,"Figures/Figure1/F1A_Oncoplot.pdf"), width = 10, he
 oncoplot(MYD88MAF, genes=c("MYD88","CD79B","CXCR4","ARID1A","BIRC3","EP300","BTG2","H1-4","TRAF2","CTBP1","NOTCH1","TP53","NDUFA7", "NOTCH2", "TNFAIP3"))
 dev.off()
 
-                         
 ##############################
 # Figure 1B
 # Stratifying samples on the CXCR4 mutant gene signature
 ##############################
 
+
 #Deriving CXCR4 DEG Signature
+
 CXCR4mod<-model.matrix(~ factor(CXCR4) + agebmbx + gender, data=pData(studyCounts)[WMOnly,])
 v<-voom(
   calcNormFactors(
@@ -159,8 +160,9 @@ CXCR4SigVST<-assay(studyVST)[rownames(CXCR4GeneSig),WMOnly] %>%
 #Clustering and visualization
 CXCR4Cluster<-kmeans(CXCR4SigVST, centers = 2,nstart = 20)$cluster
 
+
 CXCR4prcomp<-prcomp(CXCR4SigVST)
-pdf(file=file.path(outputDir,"Figures/Figure1/F1B_CXCR4Cluster.pdf"), width = 6, height = 4)
+pdf(file=file.path(outputDir,"Figures/Figure1/F1B_CXCR4Cluster.pdf"), width = 6, height = 4.5)
 
 geneScatter(CXCR4prcomp$x[,1:2],
             shape = factor(CXCR4Cluster, labels=c("Cluster 1", "Cluster 2")),
@@ -168,11 +170,11 @@ geneScatter(CXCR4prcomp$x[,1:2],
             legend=c("CXCR4 Status","Cluster Assignment"),
             legendSize=1,
             lWidth=1.5,
+            pointSize=1,
             main="",axisLabelSize=1.3, yAxisLabSize=1.3,RSOverride=TRUE)
 genePlot(CXCR4prcomp$x[,1:2],plotType="density", drawPoints=F, add=TRUE, legendSize=0.00001,RSOverride=TRUE)
 dev.off()
 
-                         
 ##############################
 # Figure 1C
 # Heatmap of top PC1 genes
@@ -257,9 +259,12 @@ camera(v, study_mSig[[8]], design = subtypeMod, contrast = BCLvPCLcon)[c(1:3,5:6
 ##############################
 # Figure 1E
 # Time to first therapy analysis by WM Subtype
+# Includes supplemental table 2  - Clinical Characteristics of Early WM
 ##############################
 
+
 #Time to first therapy analysis by subtype
+
 subtypeSuvData<-data.frame(
   pData(studyTpM)[WMOnly,c("TTFT","treated")],
   Subtype=pData(studyTpM)[WMOnly,"SimpleSubtype"],
@@ -280,6 +285,7 @@ ggsurvplot(
   palette =SubtypeTheme$plotColors$fill,
   conf.int = T)
 dev.off()
+
 
 
 ##############################
