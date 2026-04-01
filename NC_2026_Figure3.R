@@ -103,7 +103,9 @@ genePlot(pData(studyTpM)[WMOnly,"bm"],
          group=pData(studyTpM)[WMOnly,"EScoreEL"],
          subgroup=pData(studyTpM)[WMOnly,"SimpleSubtype"],
          axisText=c("","%"),
-         legendSize=1.1, main="",labelSize=1,
+         legendSize=1.2, main="",
+         groupLabSize=1.3,
+         axisLabelSize=1.4,
          ylab="WM LPC Bone Marrow Involvement",
          theme=SubtypeTheme,
          RSOverride=TRUE)
@@ -141,6 +143,8 @@ genePlot(a$Freq,
          axisText=c("","%"),
          groupLabels=c("> 12 Weeks ", "< 12 Weeks"),
          main="",
+         groupLabSize=1.4,
+         yAxisLabSize=1.3,
          theme=SubtypeTheme,
          RSOverride=TRUE)
 dev.off()
@@ -161,6 +165,8 @@ genePlot(a$Freq,
          subgroup=a$pData.studyTpM..EScoreEL,
          plotType="bar",
          axisText=c("","%"),
+         groupLabSize=1.4,
+         yAxisLabSize=1.3,
          groupLabels=c("> 12 Weeks ", "< 12 Weeks"),
          main="",
          RSOverride=TRUE)
@@ -233,6 +239,8 @@ genePlot(-MGUSvWM_EScore,
          main="",
          showCalc=TRUE,
          theme=SubtypeTheme,
+         groupLabSize=1.4,
+         yLabelSize=1.3,
          RSOverride=TRUE)
 dev.off()
 
@@ -254,7 +262,5 @@ genePlot(MGUSvWM_BCL-MGUSvWM_PCL,
          theme=SubtypeTheme,
          RSOverride=TRUE)
 dev.off()
-
-
 
 
