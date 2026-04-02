@@ -70,6 +70,7 @@ WMExpressed<-WMExpressed[rowSums(exprs(studyTpM)[WMExpressed,WMOnly] > 1) > 20]
 
 
 
+
 ##############################
 # Figure 7A
 # PreB, Tcell, Myeloid, and Stem cell Gene Expression by EScore Level
@@ -131,6 +132,15 @@ genePlot(studyTpM,c("CD34","KIT","PROM1"),
          RSOverride=TRUE)
 dev.off()
 
+# Full DGE analysis is available in the supplemental data,
+# but the following univariate analysis is included for reference
+
+map_dbl(
+  c("RAG1","MYB","IGLL1","CD3E","CD8A","CD4","CD33","FCGR3A","CD14","CD34","KIT","PROM1"),
+  function(x) {
+    wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol==x],WMOnly]~pData(studyTpM)[WMOnly,"EScore_EL"])$p.value
+    }) %>%
+  p.adjust(method="fdr")
 
 ##############################
 # Figure 7B
@@ -156,6 +166,13 @@ genePlot(studyTpM,
          RSOverride=TRUE)
 dev.off()
 
+#
+map_dbl(
+  c("PRDM1","XBP1"),
+  function(x) {
+    wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol==x],WMOnly]~pData(studyTpM)[WMOnly,"EScore_EL"])$p.value
+  }) %>%
+  p.adjust(method="fdr")
 
 ##############################
 # Figure 7C
@@ -186,11 +203,12 @@ geneScatter(
   size=round(MYD88$VAF,3),
   color=HighP,
   legend=c("MYD88 VAF=.4-.6","MYD88 VAF"),
-  legendSize=1.1, trendline="color",
+  legendSize=1.3, trendline="color",
   plotColors=list(fill=basicTheme$plotColors$points),
   axisText=list(x=c("",""),y=c("","%")),
   logScale=c(F,F),main="",
   minorTick=4,logAdjustment=0,rotateY=T,
+  legendSpacing=.6,
   RSOverride=TRUE)
 dev.off()
 
@@ -209,6 +227,15 @@ genePlot(MYD88f10$VAF,
          main="",RSOverride=TRUE)
 dev.off()
 
+# No pair wise significance in MYD88 VAF by EScore
+pairwise.wilcox.test(
+  MYD88f10$VAF,
+  pData(studyTpM)[MYD88f10$ID,"EScore_5W"])
+
+# No significance in MYD88 VAF by Early/Late EScore
+wilcox.test(
+  MYD88f10$VAF~
+  pData(studyTpM)[MYD88f10$ID,"EScore_EL"])
 
 ##############################
 # Figure 7E
@@ -225,6 +252,8 @@ genePlot(pData(studyTpM)[MYD88f10$ID,"bm"],
          main="",RSOverride=TRUE)
 dev.off()
 
+# Significance testing
+wilcox.test(pData(studyTpM)[MYD88f10$ID,"bm"] ~ pData(studyTpM)[MYD88f10$ID,"EScore_EL"])
 
 ##############################
 # Figure 7F
@@ -242,6 +271,16 @@ genePlot(studyTpM[,MYD88$ID], "S100A9",
          axisLabelSize=1.2,
          main="",RSOverride=TRUE)
 dev.off()
+
+# Testing S100A9 by Early/Late EScore within high purity group (MYD88 VAF .4-.6)
+wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol=="S100A9"],WMOnly] ~ pData(studyTpM)[WMOnly,"EScore_EL"])
+
+# Testing S100A9 expression by purity status at each EScore level
+# Not significance even without FDR adjustment
+map_dbl(paste0("ESL",1:5), function(x) {
+  IDS<-WMOnly[pData(studyTpM)[WMOnly,"EScore_5W"]==x]
+  wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol=="S100A9"],IDS] ~ factor(IDS %in% MYD88f10$ID))$p.value
+})
 
 
 
