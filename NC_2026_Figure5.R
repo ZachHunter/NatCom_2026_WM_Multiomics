@@ -76,8 +76,8 @@ EHDWMTheme<-newNPTheme(npDefaultTheme, plotColors=list(points=npDefaultTheme$plo
 ESubtypeTheme<-newNPTheme(npDefaultTheme, plotColors=list(points=npDefaultTheme$plotColors$points[EWMSubtypeColor],fill=npDefaultTheme$plotColors$fill[EWMSubtypeColor] ))
 
 # Initial guesses for the Extreme BCL and Extreme PCL subsets
-EBCL<-c("WM005", "WM024", "WM072", "WM185", "WM228", "WM248", "WM252", "WM270", "WM308", "WM350", "WM354", "WM357", "WM045")
-EPCL<-c("WM025", "WM029", "WM035", "WM044", "WM076", "WM111", "WM162", "WM204", "WM244", "WM132", "WM314", "WM367")
+EBCL<-c("WM005", "WM024", "WM072", "WM185", "WM248",  "WM270", "WM308", "WM354", "WM357", "WM045","WM040", "WM350")
+EPCL<-c("WM025", "WM029", "WM035", "WM044", "WM076", "WM111", "WM162", "WM204", "WM244", "WM132", "WM314", "WM367","WM023")
 
 # Sample IDS for WM patients only
 WMOnly<-sampleNames(studyCounts)[grep("WM", sampleNames(studyCounts))]
@@ -415,82 +415,23 @@ dev.off()
 
 ##############################
 # Figure 5D
-# Umap of top 500 high variance genes
+# Umap of top 1000 high variance genes
 ##############################
 
 set.seed(338)
 top500<-order(rowVars(assay(studyVST)[,WMOnly]),decreasing=TRUE)[1:1000]
 a<-umap(scale(t(assay(studyVST)[top500,WMOnly])))
 
-# Samples clusters identified at the extremes of the plot listed in variables
-# EBCL and EPCL. These are starting guesses from exploratory analysis.
-# We will try to refine these observations and test for significant associations
-
-# Making a new subtype factor including the extreme observations
-testTypes<-as.character(pData(studyTpM)[WMOnly,"SimpleSubtype"])
-names(testTypes)<-WMOnly
+testTypes<-as.character(pData(studyTpM)[,"SimpleSubtype"])
+names(testTypes)<-sampleNames(studyTpM)
 testTypes[EBCL]<-"EBCL"
 testTypes[EPCL]<-"EPCL"
-extremeTypes<-factor(testTypes,levels=c("Early WM","EBCL","BCL","PCL","EPCL"))
+pData(studyCounts)$ExpandedSubtype<-factor(testTypes, levels=c("HDPB","HDMB","Early WM","EBCL", "BCL", "PCL", "EPCL"))
+pData(studyTpM)$ExpandedSubtype<-factor(testTypes, levels=c("HDPB","HDMB","Early WM","EBCL", "BCL", "PCL", "EPCL"))
 
-#Next we perform DGE analysis to see if they form distinct clusters and if the group membership should be further refined
-extremeModel<-model.matrix(~0 + extremeTypes + EScore + factor(CXCR4) + gender + agebmbx, data=pData(studyCounts)[WMOnly,])
-colnames(extremeModel)<-c("EarlyWM","BCL","PCL","BCE","PCE","EScore","CXCR4","gender","age")
-BCEcon<-makeContrasts(BCE-BCL, levels=extremeModel)
-PCEcon<-makeContrasts(PCE-PCL, levels=extremeModel)
-
-v<-voom(
-  calcNormFactors(
-    DGEList(
-      counts=counts(studyCounts)[WMExpressed,WMOnly],
-      genes=fData(studyCounts)[WMExpressed,c("Chr","GeneSymbol")]
-    )
-  )
-  ,design=extremeModel)
-
-#using treat instead of eBayes here to prioritize lfc differences for clustering
-fit<-lmFit(v,design = extremeModel)
-BCEfit<-contrasts.fit(fit,BCEcon)
-PCEfit<-contrasts.fit(fit,PCEcon)
-BCEfit<-treat(BCEfit)
-PCEfit<-treat(PCEfit)
-BCEtop<-topTreat(BCEfit, lfc=1, p.value=0.05, number=Inf)
-PCEtop<-topTreat(PCEfit, lfc=1, p.value=0.05, number=Inf)
-
-#principal component analysis within PCL and BCL, respectively
-BCLextremeSort<-prcomp(
-  scale(
-    t(assay(studyVST)[rownames(BCEtop),colData(studyVST)$SimpleSubtype=="BCL"])))
-
-PCLextremeSort<-prcomp(
-  scale(
-    t(assay(studyVST)[rownames(PCEtop),colData(studyVST)$SimpleSubtype=="PCL"])))
-
-geneScatter(
-  BCLextremeSort$x[,1:2],
-  color=extremeTypes[rownames(BCLextremeSort$x)],
-  size=pData(studyTpM)[rownames(BCLextremeSort$x),"EScore"])
-
-geneScatter(
-  PCLextremeSort$x[,1:2],
-  color=extremeTypes[rownames(PCLextremeSort$x)],
-  size=pData(studyTpM)[rownames(PCLextremeSort$x),"EScore"])
-
-#The analysis above has us reevaluate our BCE and PCE assignments
-extremeTypesfinal<-as.character(pData(studyCounts)$SimpleSubtype)
-names(extremeTypesfinal)<-sampleNames(studyCounts)
-extremeTypesfinal[names(extremeTypes)]<-as.character(extremeTypes)
-extremeTypesfinal[c("WM252","WM045")]<-"BCL"
-extremeTypesfinal[c("WM254","WM040")]<-"EBCL"
-extremeTypesfinal[c("WM132","WM204", "WM367","WM244")]<-"PCL"
-extremeTypesfinal[c("WM034","WM163","WM114")]<-"EPCL"
-
-#Soring Expanded Subtype in the eSets
-pData(studyCounts)$ExpandedSubtype<-factor(extremeTypesfinal, levels=c("HDPB","HDMB","Early WM","EBCL", "BCL", "PCL", "EPCL"))
-pData(studyTpM)$ExpandedSubtype<-factor(extremeTypesfinal, levels=c("HDPB","HDMB","Early WM","EBCL", "BCL", "PCL", "EPCL"))
 
 # plotting final assignments in initial umap
-pdf(file=file.path(outputDir,"Figures/Figure5/F5E_ExtremeSubtype_umap.pdf"), width = 7, height = 6)
+pdf(file=file.path(outputDir,"Figures/Figure5/F5D_ExtremeSubtype_umap.pdf"), width = 7, height = 6)
 geneScatter(a$layout,
             color=pData(studyCounts)[rownames(a$layout),"ExpandedSubtype"],
             size=round(pData(studyTpM)[WMOnly,"EScore"],4),
@@ -507,8 +448,8 @@ dev.off()
 ##############################
 
 # Running clinical association testing between EBCL and BCL as well as EPCL and PCL
-BCEvBCL_Clin<-ClinTest(names(extremeTypesfinal)[extremeTypesfinal=="EBCL"],names(extremeTypesfinal)[extremeTypesfinal=="BCL"])
-PCEvPCL_Clin<-ClinTest(names(extremeTypesfinal)[extremeTypesfinal=="EPCL"],names(extremeTypesfinal)[extremeTypesfinal=="PCL"])
+BCEvBCL_Clin<-ClinTest(WMOnly[pData(studyTpM)[WMOnly,"ExpandedSubtype"]=="EBCL"],WMOnly[pData(studyTpM)[WMOnly,"ExpandedSubtype"]=="BCL"])
+PCEvPCL_Clin<-ClinTest(WMOnly[pData(studyTpM)[WMOnly,"ExpandedSubtype"]=="EPCL"],WMOnly[pData(studyTpM)[WMOnly,"ExpandedSubtype"]=="PCL"])
 
 BCEvBCL_Clin[[1]] %>%
   kbl(col.names = c(rep(c("median", "min", "max"),2),"p.value","adj.p.value")) %>%
@@ -538,7 +479,7 @@ PCEvPCL_Clin[[2]] %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(PCEvPCL_Clin[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/SFigure3/ST7_EPCL_vs_PCL_Clin2.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST7_EPCL_vs_PCL_Clin2.png"),width = 6)
 
 
 ##############################
@@ -548,7 +489,7 @@ PCEvPCL_Clin[[2]] %>%
 ##############################
 
 #Modeling BM to explore BCE vs BCL differences
-bmBceFit<-lm(bm ~ EScore + CXCR4 + gender + factor(extremeTypesfinal[extremeTypesfinal %in% c("BCL","EBCL")]), data=pData(studyCounts)[names(extremeTypesfinal)[extremeTypesfinal %in% c("BCL","EBCL")],])
+bmBceFit<-lm(bm ~ EScore + CXCR4 + gender + factor(ExpandedSubtype=="EBCL"), data=pData(studyCounts)[WMOnly[pData(studyCounts)[WMOnly,"ExpandedSubtype"] %in% c("BCL","EBCL")],])
 summary(bmBceFit)
 
 tidy(bmBceFit) %>%
@@ -558,12 +499,12 @@ tidy(bmBceFit) %>%
   as_image(file=file.path(outputDir,"Figures/SFigure3/SF3E_BM_lm_EBCL.pdf"),width = 6)
 
 # These are not plotted but are mentioned in the text
-BCEmaf<-subsetMaf(MAF,tsb=paste0(BCLsamps[extremeTypesfinal[BCLsamps]=="EBCL"],"_Tumor"),)
-BCLmaf<-subsetMaf(MAF,tsb=paste0(BCLsamps[extremeTypesfinal[BCLsamps]=="BCL"],"_Tumor"))
+BCEmaf<-subsetMaf(MAF,tsb=paste0(BCLsamps[pData(studyTpM)[BCLsamps,"ExpandedSubtype"]=="EBCL"],"_Tumor"),)
+BCLmaf<-subsetMaf(MAF,tsb=paste0(BCLsamps[pData(studyTpM)[BCLsamps,"ExpandedSubtype"]=="BCL"],"_Tumor"))
 forestPlot(mafCompare(BCEmaf,BCLmaf,m1Name = "EBCL", m2Name = "BCL"))
 
-PCLmaf<-subsetMaf(MAF,tsb=paste0(PCLsamps[extremeTypesfinal[PCLsamps]=="PCL"],"_Tumor"))
-PCEmaf<-subsetMaf(MAF,tsb=paste0(PCLsamps[extremeTypesfinal[PCLsamps]=="EPCL"],"_Tumor"),)
+PCLmaf<-subsetMaf(MAF,tsb=paste0(PCLsamps[pData(studyTpM)[PCLsamps,"ExpandedSubtype"]=="PCL"],"_Tumor"))
+PCEmaf<-subsetMaf(MAF,tsb=paste0(PCLsamps[pData(studyTpM)[PCLsamps,"ExpandedSubtype"]=="EPCL"],"_Tumor"),)
 #note: none found which throws an error
 #forestPlot(mafCompare(PCEmaf,PCLmaf,m1Name = "EPCL", m2Name = "PCL"))
 
@@ -579,6 +520,8 @@ genePlot(studyTpM,c("XBP1","PRDM1","SDC1"),
          legend=T, logScale=2,
          legendSize=1.1,
          pointSize=.5,
+         groupLabSize=1.3,
+         axisLabelSize=1.4,
          theme=EHDWMTheme,
          main="", ylab="Transcripts per Million + 1 (Log 2)",
          RSOverride=TRUE)
@@ -625,8 +568,8 @@ write.table(EPCLvPCL,sep="\t", quote=FALSE, file=file.path(outputDir,"DGE/EPCL_v
 ClinDat<-pData(studyTpM)[WMOnly,]%>%
   mutate(ID=WMOnly)%>%
   dplyr::filter(!is.na(tx1)) %>%
-  dplyr::select(ID, tx1, pfs1, pdtx1, responsetx1) %>%
-  mutate(Subtype=factor(pData(studyTpM)[ID,"ExpandedSubtype"]), EScore=pData(studyTpM)[ID,"EScoreEL"])
+  dplyr::select(ID, tx1, pfs1, pdtx1, responsetx1,SimpleSubtype,ExpandedSubtype) %>%
+  mutate(Subtype=ExpandedSubtype, EScore=pData(studyTpM)[ID,"EScoreEL"])
 RxType<-ClinDat$tx1
 
 RxType[RxType %in% c("BDR" ,"CARD","IDR")]<-"Proteasome"
@@ -637,7 +580,7 @@ RxType[RxType %in% c("RAD001" ,"IVEN")]<-"Other"
 ClinDat<-mutate(ClinDat,RxType=RxType)
 ClinDatProt<-filter(ClinDat, RxType=="Proteasome")
 
-pdf(file=file.path(outputDir,"Figures/Figure3/F3F_ProtPFSSubtype.pdf"), width = 9, height = 6)
+pdf(file=file.path(outputDir,"Figures/Figure5/F5F_ProtPFSSubtype.pdf"), width = 9, height = 6)
 ggsurvplot(
   surv_fit(Surv(ClinDatProt$pfs1, event=ClinDatProt$pdtx1) ~ Subtype, data=ClinDatProt),
   conf.int = FALSE,
