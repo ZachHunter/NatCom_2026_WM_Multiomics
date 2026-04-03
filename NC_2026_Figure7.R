@@ -276,11 +276,10 @@ dev.off()
 wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol=="S100A9"],WMOnly] ~ pData(studyTpM)[WMOnly,"EScore_EL"])
 
 # Testing S100A9 expression by purity status at each EScore level
-# Not significance even without FDR adjustment
 map_dbl(paste0("ESL",1:5), function(x) {
   IDS<-WMOnly[pData(studyTpM)[WMOnly,"EScore_5W"]==x]
   wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol=="S100A9"],IDS] ~ factor(IDS %in% MYD88f10$ID))$p.value
-})
+}) %>% p.adjust(method = "fdr")
 
 
 
