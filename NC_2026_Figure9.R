@@ -174,6 +174,18 @@ stat_test <- df_ok %>%
   filter(group1 == "early-EScore-WM", group2 == "late-EScore-WM") %>%
   filter(p.adj.signif != "ns")
 
+stat_test2 <- df_ok %>%
+  group_by(gene) %>%
+  pairwise_wilcox_test(
+    log2CPM ~ sample_cell_group,
+    p.adjust.method = "BH",
+    paired = FALSE,
+    exact = FALSE
+  ) %>%
+  ungroup() %>%
+  filter(group1 == "Patient-MemoryB", group2 == "early-EScore-WM") %>%
+  filter(p.adj.signif != "ns")
+
 # Auto y-position per gene panel
 y_pos <- df_long %>%
   group_by(gene) %>%
@@ -185,6 +197,14 @@ stat_test <- stat_test %>%
     xmin = "early-EScore-WM",
     xmax = "late-EScore-WM"
   )
+stat_test2 <- stat_test2 %>%
+  left_join(y_pos, by = "gene") %>%
+  mutate(
+    xmin = "Patient-MemoryB",
+    xmax = "early-EScore-WM"
+  )
+stat_test<- stat_test %>%
+  bind_rows(stat_test2)
 
 # ==============================
 # 2.5 Plot
@@ -295,6 +315,18 @@ stat_test <- df_ok %>%
   filter(group1 == "early-EScore-WM", group2 == "late-EScore-WM") %>%
   filter(p.adj.signif != "ns")
 
+stat_test2 <- df_ok %>%
+  group_by(gene) %>%
+  pairwise_wilcox_test(
+    percentPositive ~ sample_cell_group,
+    p.adjust.method = "BH",
+    paired = FALSE,
+    exact = FALSE
+  ) %>%
+  ungroup() %>%
+  filter(group1 == "Patient-MemoryB", group2 == "early-EScore-WM") %>%
+  filter(p.adj.signif != "ns")
+
 # Auto y-position per gene panel
 y_pos <- df_long %>%
   group_by(gene) %>%
@@ -306,6 +338,13 @@ stat_test <- stat_test %>%
     xmin = "early-EScore-WM",
     xmax = "late-EScore-WM"
   )
+stat_test2 <- stat_test2 %>%
+  left_join(y_pos, by = "gene") %>%
+  mutate(
+    xmin = "Patient-MemoryB",
+    xmax = "early-EScore-WM"
+  )
+stat_test<- stat_test %>% bind_rows(stat_test2)
 
 # ==============================
 # S5.2.4 Plot
