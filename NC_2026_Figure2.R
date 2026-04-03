@@ -168,7 +168,6 @@ pheatmap(NMFPlotting[,2:3],
 )
 dev.off()
 
-                         
 ##############################
 # Figure 2C
 # 3D Rendering of Metagene Space
@@ -235,12 +234,14 @@ geneScatter(
   RSOverride=TRUE)
 dev.off()
 
-#Record EScore
+# Record EScore
 FactorTemplate<-as.character(pData(studyTpM)$SimpleSubtype)
 names(FactorTemplate)<-sampleNames(studyTpM)
-FactorTemplate[WMOnly]<-as.character(factor(dmapDpt$DC1<0, labels=c("Late EScore","Early EScore")))
-EScoreEL<-factor(FactorTemplate, levels=c("HDPB","HDMB","Early EScore","Late EScore"))
-pData(studyTpM)$EScoreEL<-EScoreEL
+# Note that DPT < 0.2356381 is the EScore cutoff equivalent for DC1 = 0 as described in text
+# Note that diffusion components don't map perfectly with DPT so this does reassign two samples compared with DC1<0
+FactorTemplate[WMOnly]<-as.character(factor(dmapDpt$dpt<0.2356381, labels=c("Late","Early")))
+EScoreEL<-factor(FactorTemplate, levels=c("HDPB","HDMB","Early","Late"))
+pData(studyTpM)$EScore_EL<-EScoreEL
 EScore<-rep(NA,length(FactorTemplate))
 names(EScore)<-names(FactorTemplate)
 EScore[WMOnly]<-dmapDpt$dpt
@@ -256,8 +257,9 @@ pData(studyCounts)<-pData(studyTpM)
 # Demonstration how NMF metagenes are restricted to a plane in 3D space
 ##############################
 
-#Making Supplementary Figure 1A
-#Note that this is made using a screenshot of RGL output
+
+# Making Supplementary Figure 1A
+# Note that this is made using a screenshot of RGL output
 pca1<-prcomp(scale(dmapData))
 geneScatter(pca1$x[,1:3],
             color=pData(studyTpM)[WMOnly,"SimpleSubtype"],
@@ -316,9 +318,9 @@ geneScatter(data.frame(DPT1=dmapDpt$DPT1,DPT2=dmapDpt$DPT2),
 dev.off()
 
 
-#Supplemental Figure 1D
-#Note that this generates an interactive RLG object
-#Images captured manually
+# Supplemental Figure 1D
+# Note that this generates an interactive RLG object
+# Images captured manually
 geneScatter(NMFPlotting,
             useRgl=TRUE,
             size=pData(studyTpM)[WMOnly,"bm"],
@@ -335,7 +337,7 @@ geneScatter(NMFPlotting,
 
 EScoreSuvData<-data.frame(
   pData(studyTpM)[WMOnly,c("TTFT","DTFT","treated")],
-  EScore<-factor(pData(studyTpM)[WMOnly,"EScoreEL"])
+  EScore<-factor(pData(studyTpM)[WMOnly,"EScore_EL"])
 )
 
 pdf(file=file.path(outputDir,"Figures/Figure2/F2E_TTFT_EScore.pdf"), width = 9, height = 6)
@@ -374,7 +376,7 @@ dev.off()
 
 a<-coxph(
   Surv(pData(studyTpM)[WMOnly,"TTFT"], pData(studyTpM)[WMOnly,"treated"]) ~
-    agebmbx + gender + factor(EScoreEL) + factor(SimpleSubtype=="Early WM",labels=c("BCL/PCL","Early WM")),
+    agebmbx + gender + factor(EScore_EL) + factor(SimpleSubtype=="Early WM",labels=c("BCL/PCL","Early WM")),
   data=pData(studyTpM)[WMOnly,]) %>%
   tidy()
 a[,1]<-c("Age at Biopsy (Years)","Sex", "Late EScore","Early WM")
@@ -394,7 +396,7 @@ a %>%
 
 b<-coxph(
   Surv(pData(studyTpM)[WMOnly,"DTFT"], pData(studyTpM)[WMOnly,"treated"]) ~
-    agewm + gender + factor(EScoreEL) + factor(SimpleSubtype=="Early WM",labels=c("BCL/PCL","Early WM")),
+    agewm + gender + factor(EScore_EL) + factor(SimpleSubtype=="Early WM",labels=c("BCL/PCL","Early WM")),
   data=pData(studyTpM)[WMOnly,]) %>%
   tidy()
 b[,1]<-c("Age at Diagnosis (Years)","Sex", "Late EScore" ,"Early WM")
