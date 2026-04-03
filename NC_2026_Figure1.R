@@ -31,20 +31,20 @@ library(kableExtra)
 # Loading required files for analysis
 ##############################
 
-#Set Input/Output directories
+# Set Input/Output directories
 dataDir<-"~/Path/to/Directory/Data/"
 outputDir<-"~/Path/to/Directory/"
 
-#Loading eSets with relevant phenotype and feature data
+# Loading eSets with relevant phenotype and feature data
 # ExpressionSet of gene level TpM data from salmon.
 load(file.path(dataDir,"studyTpM.RData"))
 # SeqExpressionSet of Batch adjusted count data from STAR
 load(file.path(dataDir,"studyCounts.RData"))
 
-#mSigDb data prepared for camera/fry analysis indexed for WMExpressed
+# mSigDb data prepared for camera/fry analysis indexed for WMExpressed
 load(file.path(dataDir,"study_mSig.RData"))
 
-#All of the final patient mutations in MAF format and imported into maftools
+# All of the final patient mutations in MAF format and imported into maftools
 load(file.path(dataDir,"WES/MAF.RData"))
 
 ##############################
@@ -66,7 +66,7 @@ WMOnly<-sampleNames(studyCounts)[grep("WM", sampleNames(studyCounts))]
 WMExpressed<-featureNames(studyCounts)[rowSums(counts(studyCounts)[,WMOnly]>10)>20]
 WMExpressed<-WMExpressed[rowSums(exprs(studyTpM)[WMExpressed,WMOnly] > 1) > 20]
 
-#Testing for clinical associations between groups
+# Testing for clinical associations between groups
 ClinTest<-function(groupA,groupB) {
   continuousClin<-c("agebmbx","wbc","hb","igm","igg","iga","alymph","aneut", "bm" )
   categoricalClin<-c("b2m" ,"ipssbmbx", "familialType","Multiclonal","adenopathy","splenomegaly",  "cd5","cd10","cd23", "gender", "sxstatus" )
@@ -123,7 +123,7 @@ ClinTest<-function(groupA,groupB) {
 # Maftools Oncoplot from WES
 ##############################
 
-#Filtering to include MYD88 mutated samples only and restrict genes to of interest
+# Filtering to include MYD88 mutated samples only and restrict genes to of interest
 MYD88tsb<-as.character(unique(unlist(MAF@data[MAF@data$SYMBOL=="MYD88" & MAF@data$HGVSp_Short=="p.L273P","Tumor_Sample_Barcode"])))
 MYD88MAF<-subsetMaf(MAF, tsb=MYD88tsb)
 pdf(file=file.path(outputDir,"Figures/Figure1/F1A_Oncoplot.pdf"), width = 10, height = 5)
@@ -136,7 +136,7 @@ dev.off()
 ##############################
 
 
-#Deriving CXCR4 DEG Signature
+# Deriving CXCR4 DEG Signature
 
 CXCR4mod<-model.matrix(~ factor(CXCR4) + agebmbx + gender, data=pData(studyCounts)[WMOnly,])
 v<-voom(
@@ -157,7 +157,7 @@ CXCR4SigVST<-assay(studyVST)[rownames(CXCR4GeneSig),WMOnly] %>%
   t() %>%
   scale()
 
-#Clustering and visualization
+# Clustering and visualization
 CXCR4Cluster<-kmeans(CXCR4SigVST, centers = 2,nstart = 20)$cluster
 
 
@@ -181,10 +181,10 @@ dev.off()
 # Includes creation of supplemental table 1
 ##############################
 
-#Selecting data for heatmap of top 120 PC1 genes
+# Selecting data for heatmap of top 120 PC1 genes
 CXCR4HeatGenes<-CXCR4prcomp$rotation[order(abs(CXCR4prcomp$rotation[,1]),decreasing = TRUE),1][1:120]
 
-#Note we are capturing the return value here so we can use cuttree to define the groups later
+# Note we are capturing the return value here so we can use cuttree to define the groups later
 pdf(file=file.path(outputDir,"Figures/Figure1/F1C_SubtypeHeatmap.pdf"), width = 5, height = 4)
 a<-pheatmap(scale(t(assay(studyVST)[names(CXCR4HeatGenes),WMOnly])),
             clustering_method = "ward.D2",
@@ -196,7 +196,7 @@ a<-pheatmap(scale(t(assay(studyVST)[names(CXCR4HeatGenes),WMOnly])),
               row.names = WMOnly),RSOverride=TRUE, scale="none")
 dev.off()
 
-#Assigning the new groups
+# Assigning the new groups
 ssub<-as.character(pData(studyTpM)$CXCR4)
 SimpleSub<-factor(cutree(a$tree_row,3),labels=c("BCL","PCL","Early WM"))
 names(ssub)<-sampleNames(studyTpM)
@@ -207,7 +207,7 @@ pData(studyCounts)$SimpleSubtype<-ssub
 pData(studyTpM)$SimpleSubtype<-ssub
 colData(studyVST)$SimpleSubtype<-ssub
 
-#Formatting gene list for supplementary table 1
+# Formatting gene list for supplementary table 1
 exprs(studyTpM)[names(CXCR4HeatGenes),] %>%
   t() %>%
   as.data.frame() %>%
@@ -263,7 +263,7 @@ camera(v, study_mSig[[8]], design = subtypeMod, contrast = BCLvPCLcon)[c(1:3,5:6
 ##############################
 
 
-#Time to first therapy analysis by subtype
+# Time to first therapy analysis by subtype
 
 subtypeSuvData<-data.frame(
   pData(studyTpM)[WMOnly,c("TTFT","treated")],
@@ -341,4 +341,4 @@ ClinTest(EWM,BCL)
 rowData(studyVST)<-fData(studyTpM)[rownames(assay(studyVST)),]
 save(studyVST, file=file.path(dataDir,"studyVST.RData"))
 save(studyCounts, file=file.path(dataDir,"studyCounts.RData"))
-save(studyTpM, file=file.path(dataDir,"studyTpM.RData"))
+save(studyTpM, file=file.path(dataDir,"studyTpM.RData")))
