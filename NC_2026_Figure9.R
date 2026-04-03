@@ -1,6 +1,7 @@
 library(tidyverse)
 library(ggrepel)
 library(ggpubr)
+library(ggrastr)
 library(rstatix)
 library(bvt)
 
@@ -37,6 +38,8 @@ df_score <- read.csv(file.path(dataDir,"BPsubtype_ESscore.csv"))
 df_wide <- read.csv(file.path(dataDir,"validation_genes_log2CPM.csv"), check.names = FALSE)
 # Percentage of cells in group with detectable expression by cell type
 df_wideP <- read.csv(file.path(dataDir,"validation_genes_PercentPositiveCells.csv"), check.names = FALSE)
+# UMAP positions for single cell analysis of clonal WM LPCs, HD Memory B-cells, and Non-clonal patient Memory B-cells
+df <- read.csv(file.path(dataDir,"UMAP_HD_early_late_WMcell_memoryB.csv"))
 
 WMSubtypeColor<-c(3,1,2,4:9)
 SubtypeTheme<-newNPTheme(npDefaultTheme, plotColors=list(points=npDefaultTheme$plotColors$points[WMSubtypeColor],fill=npDefaultTheme$plotColors$fill[WMSubtypeColor] ))
@@ -384,4 +387,45 @@ ggplot(df_long, aes(x = sample_cell_group, y = percentPositive)) +
     axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
   )+
   guides(color = "none")
+dev.off()
+
+
+
+#-------------------------------
+# Figure 9.3 Single Cell UMAP
+# Colored by imputed WM Subtype
+# ------------------------------
+
+# set cell_group
+tempFact<-as.character(df$HD_early_late_WMcell_memoryB)
+tempFact[tempFact=="Early WM-WM cells"] <- "Early EScore-WM cells"
+df$HD_early_late_WMcell_memoryB <- factor(
+  tempFact,
+  levels = c("HD-Memory B cells", "WM-Memory B cells",
+             "Early EScore-WM cells", "BCL-WM cells", "PCL-WM cells")
+)
+
+# ==============================
+# 2) Plot
+# ==============================
+
+pdf(file=file.path(outputDir,"Figures/Figure9/F9C_SC_UMAP.pdf"), width = 6, height = 4.5)
+ggplot(df, aes(x = UMAP1, y = UMAP2, color = HD_early_late_WMcell_memoryB)) +
+  geom_point_rast(size = 0.01, alpha = 0.5) +
+  labs(
+    title = "Cell annotation group",
+    x = NULL,
+    y = NULL,
+    color = NULL
+  ) +
+  theme_bw() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    legend.text = element_text(size = 10),
+    plot.title = element_text(hjust = 0.5, size = 12),
+    panel.grid = element_blank()
+  ) +
+  scale_color_manual(values = c('#b5dffd','#d098ee','#acd98d','#f4737a', '#2c69b0'))+
+  guides(color = guide_legend(override.aes = list(size = 6)))
 dev.off()
