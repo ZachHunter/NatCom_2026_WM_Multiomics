@@ -79,7 +79,7 @@ WMExpressed<-WMExpressed[rowSums(exprs(studyTpM)[WMExpressed,WMOnly] > 1) > 20]
 
 # Defining model and contrast.
 # Covariates include expanded subtype, CXCR4, sex and age
-EScoreMod<-model.matrix(~ 0 + EScore_EL + factor(ExpandedSubtype) + factor(CXCR4) + gender + agebmbx, data=pData(studyCounts)[WMOnly,])
+EScoreMod<-model.matrix(~ 0 + factor(EScore_EL) + factor(ExpandedSubtype) + factor(CXCR4) + gender + agebmbx, data=pData(studyCounts)[WMOnly,])
 colnames(EScoreMod)<-c("Early","Late","EBCL","BCL","PCL","EPCL","CXCR4","Sex","Age")
 EScoreCon<-makeContrasts(Late-Early, levels=EScoreMod)
 
