@@ -36,7 +36,7 @@ library(kableExtra)
 dataDir<-"~/Path/to/Directory/Data/"
 outputDir<-"~/Path/to/Directory/"
 
-#Loading eSets with relevant phenotype and feature data
+# Loading eSets with relevant phenotype and feature data
 # ExpressionSet of gene level TpM data from salmon.
 load(file.path(dataDir,"studyTpM.RData"))
 # SeqExpressionSet of Batch adjusted count data from STAR
@@ -44,7 +44,7 @@ load(file.path(dataDir,"studyCounts.RData"))
 # variance stabilized transformation data from DESeq2 generated in Figure 1 code
 load(file.path(dataDir,"studyVST.RData"))
 
-#mSigDb data prepared for camera/fry analysis indexed for WMExpressed
+# mSigDb data prepared for camera/fry analysis indexed for WMExpressed
 load(file.path(dataDir,"study_mSig.RData"))
 
 
@@ -67,7 +67,7 @@ WMOnly<-sampleNames(studyCounts)[grep("WM", sampleNames(studyCounts))]
 WMExpressed<-featureNames(studyCounts)[rowSums(counts(studyCounts)[,WMOnly]>10)>20]
 WMExpressed<-WMExpressed[rowSums(exprs(studyTpM)[WMExpressed,WMOnly] > 1) > 20]
 
-#Testing clinical associations between groups
+# Testing clinical associations between groups
 ClinTest<-function(groupA,groupB) {
   continuousClin<-c("agebmbx","wbc","hb","igm","igg","iga","alymph","aneut", "bm" )
   categoricalClin<-c("b2m" ,"ipssbmbx", "familialType","Multiclonal","adenopathy","splenomegaly",  "cd5","cd10","cd23", "gender", "sxstatus" )
@@ -176,8 +176,8 @@ dev.off()
 # Final gene lists can be seen in supplemental table 5
 ##############################
 
-#Note that this generates an interactive RLG object
-#Images captured manually
+# Note that this generates an interactive RLG object
+# Images captured manually
 geneScatter(NMFPlotting,
             useRgl=TRUE,
             size=pData(studyTpM)[WMOnly,"bm"],
@@ -186,8 +186,8 @@ geneScatter(NMFPlotting,
             pointSize=.75,
             main="")
 
-#Extract Features from NMF Model
-#Note that metagene 1 throws an error with the default Kim method
+# Extract Features from NMF Model
+# Note that metagene 1 throws an error with the default Kim method
 NMFFeatures<-extractFeatures(NMFModel)
 NMFFeatures[[1]]<-extractFeatures(NMFModel,"max")[[1]]
 NMFFeatures<-map(NMFFeatures,function(g) rownames(NMFData[g,]))
