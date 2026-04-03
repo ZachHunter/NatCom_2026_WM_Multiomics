@@ -165,14 +165,31 @@ barcodeplot(fit$t[,1],
             xlab="moderated t-statistic")
 dev.off()
 
+##############################
+# Figure 10D - TLR4 and TLR9 Expression with EScore
+##############################
+
+pdf(file=file.path(outputDir,"Figures/Figure10/F10D_TLR4_TRL9_by_EScore.pdf"), width = 9, height = 6)
+genePlot(studyTpM,
+         c("TLR4","TLR9"),
+         group="EScore_5W",
+         groupByGene = FALSE,
+         groupLabSize=1.3,
+         axisLabelSize=1.2,
+         legendSize=1.3,
+         main="", ylab="Transcripts per Million + 1 (Log 2 Scale)",
+         logScale=2,
+         legend=TRUE,
+         RSOverride=TRUE)
+dev.off()
 
 ##############################
-# Figure 10D - PFS in Proteasome based therapies with EScore Levels 4/5
+# Figure 10E - PFS in Proteasome based therapies with EScore Levels 4/5
 ##############################
 
 ClinDatProt$EScore<-ClinDatProt$EScore5W
 
-pdf(file=file.path(outputDir,"Figures/Figure10/F10D_Proteasome_LateEScore_Surv.pdf"), width = 9, height = 6)
+pdf(file=file.path(outputDir,"Figures/Figure10/F10E_Proteasome_LateEScore_Surv.pdf"), width = 9, height = 6)
 ggsurvplot(
   surv_fit(Surv(ClinDatProt$pfs1, event=ClinDatProt$pdtx1) ~ EScore, data=ClinDatProt),
   conf.int = FALSE,
@@ -184,4 +201,3 @@ ggsurvplot(
   title="Proteasome Inhibitor Based Therapies"
 )
 dev.off()
-
