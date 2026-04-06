@@ -60,8 +60,8 @@ WMExpressed<-featureNames(studyCounts)[rowSums(counts(studyCounts)[,WMOnly]>10)>
 WMExpressed<-WMExpressed[rowSums(exprs(studyTpM)[WMExpressed,WMOnly] > 1) > 20]
 
 #WM Gene Sets for EScore and Subtype from NMF analysis in Figure 2
-EScore_GeneSet<-c("LYZ", "FCN1", "VCAN", "S100A9","S100A8","CD14","SERPINA1","CST3","CPVL",
-                  "CD93","CD163","CSF3R","CD36", "TGFBI","C5AR1","FPR1","ANXA1","LTF", "CD300E",
+EScore_GeneSet<-c("LYZ", "FCN1", "VCAN", "S100A9", "S100A8", "CD14", "SERPINA1", "CST3", "CPVL",
+                  "CD93", "CD163", "CSF3R", "CD36", "TGFBI", "C5AR1", "FPR1", "ANXA1", "LTF", "CD300E",
                   "FGR", "FCER1G", "CD4", "CSF1R", "CXCL8", "FCGR3A", "GAS7", "S100A12")
 
 BCL_GeneSet<-c("AC092868.1", "KLF14", "GRIK3", "SGSM1", "ACTG2", "USP44", "MYOCD", "PDE7B",
@@ -200,8 +200,8 @@ names(ImputedSubtype)<-names(MGUSvWM_PCL)
 
 # Assigning apriori MGUS status and updating labels
 ImputedSubtype[pData(MGUSvWM)[names(ImputedSubtype),"diagnosis:ch1"]=="IgMMGUS"]<-"IgM MGUS"
-ImputedSubtype[ImputedSubtype==1]<-"BCL"
-ImputedSubtype[ImputedSubtype==2]<-"PCL"
+ImputedSubtype[ImputedSubtype==1]<-"PCL"
+ImputedSubtype[ImputedSubtype==2]<-"BCL"
 ImputedSubtype<-factor(ImputedSubtype, levels=c("IgM MGUS", "BCL","PCL"))
 pData(MGUSvWM)$Subtype<-ImputedSubtype
 
