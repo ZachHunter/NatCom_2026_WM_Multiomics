@@ -306,7 +306,7 @@ EWMvSubtyped[[1]] %>%
   kbl(col.names = c(rep(c("median", "min", "max"),2),"p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
-  add_header_above(c("","Early WM (N=86)"=3,"Subtyped WM (N=163)"=3,"","")) %>%
+  add_header_above(c("","Early WM (N=66)"=3,"Subtyped WM (N=183)"=3,"","")) %>%
   row_spec(which(EWMvSubtyped[[1]]$adj.p.value<0.05),background="lightgrey") %>%
   as_image(file = file.path(outputDir,"Figures/STables/ST2_EWM_vs_Subtyped_Clin1.pdf"),width = 6)
 
@@ -323,12 +323,12 @@ BCLvPCL[[1]] %>%
   kbl(col.names = c(rep(c("median", "min", "max"),2),"p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
-  add_header_above(c("","BCL Subtyped WM (N=96)"=3,"PCL Subtyped WM (N=67)"=3,"","")) %>%
+  add_header_above(c("","BCL Subtyped WM (N=86)"=3,"PCL Subtyped WM (N=97)"=3,"","")) %>%
   row_spec(which(BCLvPCL[[1]]$adj.p.value<0.05),background="lightgrey") %>%
   as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin1.pdf"),width = 6)
 
 BCLvPCL[[2]] %>%
-  kbl(col.names = c("BCL Subtyped WM (N=96)","PCL Subtyped WM (N=67)","p.value","adj.p.value")) %>%
+  kbl(col.names = c("BCL Subtyped WM (N=86)","PCL Subtyped WM (N=97)","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(BCLvPCL[[2]]$adj.p.value<0.05),background="lightgrey") %>%
@@ -341,4 +341,4 @@ ClinTest(EWM,BCL)
 rowData(studyVST)<-fData(studyTpM)[rownames(assay(studyVST)),]
 save(studyVST, file=file.path(dataDir,"studyVST.RData"))
 save(studyCounts, file=file.path(dataDir,"studyCounts.RData"))
-save(studyTpM, file=file.path(dataDir,"studyTpM.RData")))
+save(studyTpM, file=file.path(dataDir,"studyTpM.RData"))
