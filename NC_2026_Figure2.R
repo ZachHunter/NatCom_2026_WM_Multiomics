@@ -203,7 +203,7 @@ kbl(FeatureSet) %>%
   kable_paper(full_width=FALSE) %>%
   as_image(file = file.path(outputDir,"Figures/STables/ST5_CandidateSignatureGenes.pdf"))
 
-#Just for convenience as ENSGs are easier to track
+# Just for convenience as ENSGs are easier to track
 FeatureSetENST<-FeatureSet
 for(i in 1:3){
   FeatureSetENST[seq(length(NMFFeatures[[i]])),i]<-unlist(NMFFeatures[[i]])
@@ -422,12 +422,12 @@ ELClin[[1]] %>%
   kbl(col.names = c(rep(c("median", "min", "max"),2),"p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
-  add_header_above(c("","Early EScore (N=148)"=3,"Late EScore (N=101)"=3,"","")) %>%
+  add_header_above(c("","Early EScore (N=147)"=3,"Late EScore (N=102)"=3,"","")) %>%
   row_spec(which(ELClin[[1]]$adj.p.value<0.05),background="lightgrey") %>%
   as_image(file = file.path(outputDir,"Figures/STables/ST4_EScore_Early_vs_Late_Clin1.pdf"),width = 6)
 
 ELClin[[2]] %>%
-  kbl(col.names = c("Early EScore (N=148)","Late EScore (N=101)","p.value","adj.p.value")) %>%
+  kbl(col.names = c("Early EScore (N=147)","Late EScore (N=102)","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(ELClin[[2]]$adj.p.value<0.05),background="lightgrey") %>%
