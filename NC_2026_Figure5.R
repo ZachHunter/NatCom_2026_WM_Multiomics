@@ -419,8 +419,8 @@ dev.off()
 ##############################
 
 set.seed(338)
-top500<-order(rowVars(assay(studyVST)[,WMOnly]),decreasing=TRUE)[1:1000]
-a<-umap(scale(t(assay(studyVST)[top500,WMOnly])))
+top1K<-order(rowVars(assay(studyVST)[,WMOnly]),decreasing=TRUE)[1:1000]
+a<-umap(scale(t(assay(studyVST)[top1K,WMOnly])))
 
 testTypes<-as.character(pData(studyTpM)[,"SimpleSubtype"])
 names(testTypes)<-sampleNames(studyTpM)
@@ -455,31 +455,31 @@ BCEvBCL_Clin[[1]] %>%
   kbl(col.names = c(rep(c("median", "min", "max"),2),"p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
-  add_header_above(c("","Extreme BCL (N=15)"=3,"BCL (N=81)"=3,"","")) %>%
+  add_header_above(c("","Extreme BCL (N=12)"=3,"BCL (N=74)"=3,"","")) %>%
   row_spec(which(BCEvBCL_Clin[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST6_EBCL_vs_BCL_Clin1.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST6_EBCL_vs_BCL_Clin1.pdf"),width = 6)
 
 BCEvBCL_Clin[[2]] %>%
   kbl(col.names = c("Extreme BCL","BCL","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(BCEvBCL_Clin[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST6_EBCL_vs_BCL_Clin2.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST6_EBCL_vs_BCL_Clin2.pdf"),width = 6)
 
 PCEvPCL_Clin[[1]] %>%
   kbl(col.names = c(rep(c("median", "min", "max"),2),"p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
-  add_header_above(c("","Extreme PCL (N=15)"=3,"PCL (N=52)"=3,"","")) %>%
+  add_header_above(c("","Extreme PCL (N=13)"=3,"PCL (N=84)"=3,"","")) %>%
   row_spec(which(PCEvPCL_Clin[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST7_EPCL_vs_PCL_Clin1.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST7_EPCL_vs_PCL_Clin1.pdf"),width = 6)
 
 PCEvPCL_Clin[[2]] %>%
   kbl(col.names = c("Extreme PCL","PCL","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(PCEvPCL_Clin[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST7_EPCL_vs_PCL_Clin2.png"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST7_EPCL_vs_PCL_Clin2.pdf"),width = 6)
 
 
 ##############################
@@ -494,7 +494,7 @@ summary(bmBceFit)
 
 tidy(bmBceFit) %>%
   mutate(term=c("(Intercept)","EScore","CXCR4: Mutated","Sex: Male","Subtype: EBCL")) %>%
-  kbl(caption="Linear Model of WM LPC BM Involment in BCL and EBCL Subtyped Samples",digits = 5) %>%
+  kbl(caption="Linear Model of WM LPC BM Involvement in BCL and EBCL Subtyped Samples",digits = 5) %>%
   kable_classic() %>%
   as_image(file=file.path(outputDir,"Figures/SFigure3/SF3E_BM_lm_EBCL.pdf"),width = 6)
 
@@ -572,6 +572,31 @@ ClinDat<-pData(studyTpM)[WMOnly,]%>%
   mutate(Subtype=ExpandedSubtype, EScore=pData(studyTpM)[ID,"EScoreEL"])
 RxType<-ClinDat$tx1
 
+ClinDatBDR<-filter(ClinDat, RxType=="BDR")
+ClinDatCARD<-filter(ClinDat, RxType=="CARD")
+
+ggsurvplot(
+  surv_fit(Surv(ClinDatBDR$pfs1, event=ClinDatBDR$pdtx1) ~ Subtype, data=ClinDatBDR),
+  conf.int = FALSE,
+  pval = TRUE,
+  ylab="Progression Free Survival",
+  risk.table=T,
+  xlab="Time (Months)",
+  risk.table.height=.35,
+  title="Progression Free Survival post BDR Therapy",
+  palette =ESubtypeTheme$plotColors$fill)
+
+ggsurvplot(
+  surv_fit(Surv(ClinDatCARD$pfs1, event=ClinDatCARD$pdtx1) ~ Subtype, data=ClinDatCARD),
+  conf.int = FALSE,
+  pval = TRUE,
+  ylab="Progression Free Survival",
+  risk.table=T,
+  xlab="Time (Months)",
+  risk.table.height=.35,
+  title="Progression Free Survival post CARD Therapy",
+  palette =ESubtypeTheme$plotColors$fill)
+
 RxType[RxType %in% c("BDR" ,"CARD","IDR")]<-"Proteasome"
 RxType[RxType %in% c("BENDA" ,"BENDAR","FR", "CPR", "CDR", "BR")]<-"Chemo"
 RxType[RxType %in% c("OFA" ,"R","R-dex")]<-"CD20mab"
@@ -594,6 +619,43 @@ ggsurvplot(
 
 dev.off()
 
+##############################
+# Supplementary Table 8
+# Table of first therapy received by WM subtype
+# Note that the paper versions of these tables were reformatted in Excel
+# to further improved clarity and compactness
+##############################
+
+a<-xtabs(~  factor(ExpandedSubtype) + tx1, data=pData(studyTpM)[WMOnly,]) %>%
+  addmargins(margin = 1)
+rownames(a)[6]<-"Total"
+colnames(a)[17]<-"ZANU"
+
+kbl(a) %>%
+  kable_classic() %>%
+  column_spec(1,italic = TRUE) %>%
+  row_spec(6,background = "lightgrey") %>%
+  as_image(file = file.path(outputDir,"Figures/STables/ST8_RX1_by_Subtype.pdf"),width = 6)
+
+
+##############################
+# Supplementary Table 9
+# Table of first type of therapy received by WM subtype
+# Note that the paper versions of these tables were reformatted in Excel
+# to further improved clarity and compactness
+##############################
+
+a<- xtabs(~  factor(ExpandedSubtype) + RxType, data=pData(studyTpM)[rownames(ClinDat),]) %>%
+  addmargins(margin = 1)
+rownames(a)[6]<-"Total"
+
+kbl(a) %>%
+  kable_classic() %>%
+  column_spec(1,italic = TRUE) %>%
+  row_spec(6,background = "lightgrey") %>%
+  as_image(file = file.path(outputDir,"Figures/STables/ST9_RX1Type_by_Subtype.pdf"),width = 6)
+
 
 save(studyCounts, file=file.path(dataDir,"studyCounts.RData"))
 save(studyTpM, file=file.path(dataDir,"studyTpM.RData"))
+
