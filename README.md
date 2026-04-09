@@ -22,6 +22,8 @@ Each file generates the associated main figure panel in addition to related supp
   - Supplementary Figure 3: *Confirmation of WM Subtype findings*
   - Supplementary Table 6: *Clinical associations with EBCL and BCL subtyped WM*
   - Supplementary Table 7: *Clinical associations with EPCL and PCL subtyped WM*
+  - Supplementary Table 8: *First therapy received by WM subtype*
+  - Supplementary Table 9: *Type of first therapy received by WM subtype*
   - EBCL versus BCL differential gene expression analysis
   - EPCL versus PCL differential gene expression analysis
 - **NC_2026_Figure6.R:** *Characterization of the WM EScore*
