@@ -28,8 +28,8 @@ library(maftools)
 ##############################
 
 # Set Input/Output directories
-dataDir<-"~/Desktop/DesktopData/Papers/Multiomics/Data/"
-outputDir<-"~/Desktop/DesktopData/Papers/Multiomics"
+dataDir<-"~/Path/to/Directory/Data/"
+outputDir<-"~/Path/to/Directory/"
 
 # Loading eSets with relevant phenotype and feature data
 # ExpressionSet of gene level TpM data from salmon.
