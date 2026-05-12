@@ -159,7 +159,7 @@ a<-xtabs(~ preTherapyMarrow + pData(studyTpM)$EScoreEL)[,3:4]
 fisher.test(a)
 a<-as.data.frame(round(a/rowSums(a)*100,1))
 
-pdf(file=file.path(outputDir,"Figures/Figure3/F3C_EScore12W.png"), width = 7, height = 6)
+pdf(file=file.path(outputDir,"Figures/Figure3/F3C_EScore12W.pdf"), width = 7, height = 6)
 genePlot(a$Freq,
          group=a$preTherapyMarrow,
          subgroup=a$pData.studyTpM..EScoreEL,
