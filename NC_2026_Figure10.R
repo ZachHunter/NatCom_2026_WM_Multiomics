@@ -7,6 +7,7 @@ library(survival)
 library(survminer)
 library(kableExtra)
 library(edgeR)
+library(bvt)
 
 #============================#
 # The Evolution and Subtypes of Waldenstrom Macroglobulinemia:
