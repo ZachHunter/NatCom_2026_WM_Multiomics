@@ -72,6 +72,7 @@ WMExpressed<-WMExpressed[rowSums(exprs(studyTpM)[WMExpressed,WMOnly] > 1) > 20]
 
 
 
+
 ##############################
 # Figure 7A
 # PreB, Tcell, Myeloid, and Stem cell Gene Expression by EScore Level
@@ -177,7 +178,7 @@ map_dbl(
 
 ##############################
 # Figure 7C
-# BM vs EScore and MYD88 VAF
+# MYD88 VAF vs EScore and BM
 # Includes Generating MYD88 VAF Data
 ##############################
 
@@ -196,21 +197,38 @@ MYD88f10 <- MYD88[MYD88$VAF >= .4 & MYD88$VAF <= .6,]
 HighP<-MYD88$ID %in% MYD88f10$ID
 names(HighP)<-MYD88$ID
 
-pdf(file=file.path(outputDir,"Figures/Figure7/F7C_BM_EScore.pdf"), width = 7, height = 7)
-geneScatter(
+# Making plot in advance so we can incorperate the statistics
+a<-geneScatter(
   data.frame(
     EScore=pData(studyTpM)[MYD88$ID,"EScore"],
-    BM=pData(studyTpM)[MYD88$ID,"bm"]),
-  size=round(MYD88$VAF,3),
+    'MYD88 VAF'=MYD88$VAF),
+  size=pData(studyTpM)[MYD88$ID,"bm"],
   color=HighP,
-  legend=c("MYD88 VAF=.4-.6","MYD88 VAF"),
-  legendSize=1.3, trendline="color",
-  plotColors=list(fill=basicTheme$plotColors$points),
-  axisText=list(x=c("",""),y=c("","%")),
-  logScale=c(F,F),main="",
-  minorTick=4,logAdjustment=0,rotateY=T,
+  legend=c("MYD88 VAF=.4-.6","BM (%)"),
+  legendSize=1.3,
+  trendline="color",
+  ylab="MYD88 VAF",
+  main="",
+  minorTick=4,
+  rotateY=T,
   legendSpacing=.6,
+  plotColors=list(
+    fill=map_chr(
+      npDefaultTheme$plotColors$fill,
+      setAlpha, .6)),
+  corMethod = "spearman",
   RSOverride=TRUE)
+
+pdf(file=file.path(outputDir,"Figures/Figure7/F7C_MYD88_BM_EScore.pdf"), width = 7, height = 7)
+plot(a,
+     sub=paste0(
+       "TRUE - rho: ",
+       round(a$stats[[2]]$cor$estimate,3),
+       " ; p-value: ",round(a$stats[[2]]$cor$p.value,4),
+       " / FALSE -  rho: ",
+       round(a$stats[[1]]$cor$estimate,3),
+       " ; p-value: ",
+       round(a$stats[[1]]$cor$p.value,4)))
 dev.off()
 
 
@@ -273,6 +291,24 @@ genePlot(studyTpM[,MYD88$ID], "S100A9",
          main="",RSOverride=TRUE)
 dev.off()
 
+# Testing the impact of high purity (MYD88 VAF=.4-.6) on S100A9 expression
+# while controlling for EScore (continuous) or EScore Level (discrete)
+
+S100A9Data<-data.frame(
+  S100A9=log(exprs(studyTpM)[fData(studyTpM)$GeneSymbol=="S100A9",names(HighP)] +1 ,2),
+  HighP,
+  EScore=pData(studyTpM)[names(HighP),"EScore"],
+  ESLevel=pData(studyTpM)[names(HighP),"EScore_5W"])
+
+S100.lm<-lm(S100A9 ~ HighP + EScore, data=S100A9Data)
+anova(S100.lm)
+emmeans(S100.lm, pairwise ~ HighP)
+
+S100.lm2<-lm(S100A9 ~ HighP + ESLevel, data=S100A9Data)
+anova(S100.lm2)
+emmeans(S100.lm2, pairwise ~ HighP)
+emmeans(S100.lm2, pairwise ~ ESLevel)
+
 # Testing S100A9 by Early/Late EScore within high purity group (MYD88 VAF .4-.6)
 wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol=="S100A9"],WMOnly] ~ pData(studyTpM)[WMOnly,"EScore_EL"])
 
@@ -281,7 +317,3 @@ map_dbl(paste0("ESL",1:5), function(x) {
   IDS<-WMOnly[pData(studyTpM)[WMOnly,"EScore_5W"]==x]
   wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol=="S100A9"],IDS] ~ factor(IDS %in% MYD88f10$ID))$p.value
 }) %>% p.adjust(method = "fdr")
-
-
-
-
