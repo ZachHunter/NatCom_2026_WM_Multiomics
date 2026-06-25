@@ -12,7 +12,7 @@ library(bvt)
 #
 # This R Script includes code used to generate:
 #   Figure panel 9
-#   Supplemental Figure 5B
+#   Supplemental Figure 6B
 #
 # Single Cell analysis courtesy of Dr. Hao Sun
 # Data from Sun H,  et al. Evolution of tumor subclones and T-cell dynamics underlie variable ibrutinib responses in Waldenström macroglobulinemia.
@@ -250,12 +250,12 @@ ggplot(df_long, aes(x = sample_cell_group, y = log2CPM)) +
 dev.off()
 
 #-------------------------------
-# Sup Figure 5.2 %Positive Cells 4 groups
+# Sup Figure 6B %Positive Cells 4 groups
 # EScore genes in Early/Late + Controls
 # ------------------------------
 
 # ==============================
-# S5.2.1 Wide -> long, pivot ALL numeric columns
+# S6.2.1 Wide -> long, pivot ALL numeric columns
 # ==============================
 
 
@@ -283,7 +283,7 @@ df_long <- df_wideP %>%
   )
 
 # ==============================
-# S5.2.2 QC for statistical tests
+# S6.2.2 QC for statistical tests
 #    Require per gene x group:
 #    - n >= 2
 #    - >=2 unique values
@@ -304,7 +304,7 @@ df_ok <- df_long %>%
   )
 
 # ==============================
-# S5.2.3 Wilcoxon (BH), keep Early vs Late only
+# S6.2.3 Wilcoxon (BH), keep Early vs Late only
 # ==============================
 stat_test <- df_ok %>%
   group_by(gene) %>%
@@ -350,14 +350,14 @@ stat_test2 <- stat_test2 %>%
 stat_test<- stat_test %>% bind_rows(stat_test2)
 
 # ==============================
-# S5.2.4 Plot
+# S6.2.4 Plot
 # ==============================
 pal <- c("HD-MemoryB"       = "#b5dffd",
          "Patient-MemoryB"       = "#d098ee",
          "early-EScore-WM"  = "#acd98d",
          "late-EScore-WM"   = "#f4737a")
 
-pdf(file=file.path(outputDir,"Figures/SFigure5/SF5B_SC_EScore_PercPos_4way.pdf"), width = 6, height = 4.5)
+pdf(file=file.path(outputDir,"Figures/SFigure6/SF6B_SC_EScore_PercPos_4way.pdf"), width = 6, height = 4.5)
 ggplot(df_long, aes(x = sample_cell_group, y = percentPositive)) +
   geom_boxplot(
     aes(fill = sample_cell_group),
