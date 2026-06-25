@@ -13,7 +13,7 @@ library(DESeq2)
 #
 # This R Script includes code used to generate:
 #   Figure panel 4
-#   Supplemental Figure panel 2
+#   Supplemental Figure panel 3
 #   BCL vs. PCL DGE data
 #
 # Special note - Uses r package bvt for plotting
@@ -137,40 +137,13 @@ write.table(BCLvPCL,sep="\t", quote=FALSE, file=file.path(outputDir,"DGE/BCL_vs_
 
 
 ##############################
-# Supplemental Figure 2A
-# Signature genes by subtype and CXCR4 status
-##############################
-
-pdf(file=file.path(outputDir,"Figures/SFigure2/SF2A_SubtypeCXCR4.pdf"), width = 9, height = 5)
-genePlot(
-  studyTpM[,WMOnly],
-  gene = c("WNK2","DUSP22","GPER1","CABLES1"),
-  group="CXCR4",
-  highlight="SimpleSubtype",
-  logScale=2,
-  legendSize=1.1,
-  guides=TRUE,
-  lWidth=2,
-  plotColors=list(lines=setAlpha("black",.8),fill="white"),
-  errorBarLineType=1,
-  pointSize=.65,
-  theme=SubtypeTheme,
-  ylab="Transcripts per Million + 1 (Log 2)",
-  groupLabelSpacing=1.2,
-  subgroupLabSize=.75,
-  main="",
-  RSOverride=TRUE)
-dev.off()
-
-
-##############################
-# Supplemental Figure 2B
+# Supplemental Figure 3A
 # BCL Signature genes expression in HD immune cells populations
 ##############################
 
 Immune_BCL<-Immune[Immune$Gene.name %in% BCLtoPlot,]
 
-pdf(file=file.path(outputDir,"Figures/SFigure2/SF2B_BCLImmune.pdf"), width = 8, height = 5)
+pdf(file=file.path(outputDir,"Figures/SFigure3/SF3B_BCLImmune.pdf"), width = 8, height = 5)
 genePlot(Immune_BCL$nTPM,
          group=Immune_BCL$Gene.name,
          subgroup=Immune_BCL$Immune.cell,
@@ -184,13 +157,13 @@ dev.off()
 
 
 ##############################
-# Supplemental Figure 2C
+# Supplemental Figure 3B
 # BCL Signature genes expression in HD immune cells populations
 ##############################
 
 Immune_PCL<-Immune[Immune$Gene.name %in% PCLtoPlot,]
 
-pdf(file=file.path(outputDir,"Figures/SFigure2/SF2C_PCLImmune.pdf"), width = 8, height = 5)
+pdf(file=file.path(outputDir,"Figures/SFigure3/SF3B_PCLImmune.pdf"), width = 8, height = 5)
 genePlot(Immune_PCL$nTPM,
          group=Immune_PCL$Gene.name,
          subgroup=Immune_PCL$Immune.cell,
@@ -201,6 +174,5 @@ genePlot(Immune_PCL$nTPM,
          ylab="Normalized Transcripts per Million (nTpM)",
          RSOverride=TRUE)
 dev.off()
-
 
 
