@@ -18,7 +18,7 @@ Each file generates the associated main figure panel in addition to related supp
 - **NC_2026_Figure3.R:** *Clinical associations and external validation of Subtype and EScore*
   - Supplementary Figure 2: *BCL and PCL signature gene co-expression in Early WM*
 - **NC_2026_Figure4.R:** *Subtype signature gene expression and validation*
-  - Supplementary Figure 4: *Expression of WM Subtype genes in immune cells*
+  - Supplementary Figure 3: *Expression of WM Subtype genes in immune cells*
   - BCL versus PCL differential gene expression analysis
 - **NC_2026_Figure5.R:** *Characterization of the BCL and PCL WM subtypes*
   - Supplementary Figure 4: *Confirmation of WM Subtype findings*
