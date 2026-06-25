@@ -91,7 +91,11 @@ ggsurvplot(
   risk.table=T,
   xlab="Time (Months)",
   risk.table.height=.35,
-  title="BTKi Based Therapies"
+  title="BTKi Based Therapies",
+  fontsize=7,
+  legend.labs=c("Early", "Late"),
+  legend.title="EScore", pval.size = 8,
+  font.x=18,font.y=18,font.legend=18, font.tickslab=14
 )
 dev.off()
 
@@ -113,7 +117,11 @@ ggsurvplot(
   risk.table=T,
   xlab="Time (Months)",
   risk.table.height=.35,
-  title="BTKi Based Therapies"
+  title="BTKi Based Therapies",
+  fontsize=7,
+  legend.labs=c("ESL1-3", "ESL4-5"),
+  legend.title="EScore Level", pval.size = 8,
+  font.x=18,font.y=18,font.legend=18, font.tickslab=14
 )
 dev.off()
 
@@ -199,6 +207,10 @@ ggsurvplot(
   risk.table=T,
   xlab="Time (Months)",
   risk.table.height=.35,
-  title="Proteasome Inhibitor Based Therapies"
+  title="Proteasome Inhibitor Based Therapies",
+  fontsize=7,
+  legend.labs=c("ESL1-3", "ESL4-5"),
+  legend.title="EScore Level", pval.size = 8,
+  font.x=18,font.y=18,font.legend=18, font.tickslab=14
 )
 dev.off()
