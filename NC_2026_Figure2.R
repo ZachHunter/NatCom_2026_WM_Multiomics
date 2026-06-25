@@ -19,7 +19,7 @@ library(kableExtra)
 # This R Script includes code used to generate:
 #   Figure panel 2
 #   Supplemental figure panel 1
-#   Supplemental tables 4-5
+#   Supplemental tables 3, 5 and 6
 #
 # Special note - Uses r package bvt for plotting
 # Bioconductor visualization tools (bvt) is available at https://github.com/ZachHunter/bvt
@@ -118,7 +118,6 @@ ClinTest<-function(groupA,groupB) {
 }
 
 
-
 ##############################
 # Figure 2A
 # Non-Negative Matrix Factorization
@@ -173,7 +172,7 @@ dev.off()
 # 3D Rendering of Metagene Space
 # Includes metagene gene signature extraction
 # Note that genes are further filtered to ensure consistent FC direction and equal numbers between PCL and BCL
-# Final gene lists can be seen in supplemental table 5
+# Final gene lists can be seen in supplemental table 6
 ##############################
 
 # Note that this generates an interactive RLG object
@@ -201,7 +200,7 @@ for(i in 1:3){
 colnames(FeatureSet)<-names(NMFFeatures)
 kbl(FeatureSet) %>%
   kable_paper(full_width=FALSE) %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST5_CandidateSignatureGenes.pdf"))
+  as_image(file = file.path(outputDir,"Figures/STables/ST6_CandidateSignatureGenes.pdf"))
 
 # Just for convenience as ENSGs are easier to track
 FeatureSetENST<-FeatureSet
@@ -349,7 +348,12 @@ ggsurvplot(
   ylab="Time to First Therapy from Study Biopsy",
   risk.table=T,
   xlab="Time (Years)",
-  conf.int = T)
+  conf.int = T,
+  fontsize=7,
+  legend.labs=c("Early", "Late"),
+  tables.height=0.25,
+  legend.title="WM EScore", pval.size = 8,
+  font.x=18,font.y=18,font.legend=18, font.tickslab=14)
 dev.off()
 
 ##############################
@@ -366,11 +370,16 @@ ggsurvplot(
   ylab="Time to First Therapy From Diagnosis",
   risk.table=T,
   xlab="Time (Years)",
-  conf.int = T)
+  conf.int = T,
+  fontsize=7,
+  legend.labs=c("Early", "Late"),
+  tables.height=0.25,
+  legend.title="WM EScore", pval.size = 8,
+  font.x=18,font.y=18,font.legend=18, font.tickslab=14)
 dev.off()
 
 ##############################
-# Figure 2G
+# Supplementary Table 3A
 # Cox PH time to first therapy from biopsy by EScore + sex + age + Early WM status
 ##############################
 
@@ -386,11 +395,11 @@ a %>%
   kable_paper(full_width = FALSE) %>%
   column_spec(1,italic = TRUE) %>%
   column_spec(2,color=ifelse(a$estimate<0,"red","black")) %>%
-  as_image(file = file.path(outputDir,"Figures/Figure2/F2G_COXPH_TTFT.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST3_COXPH_TTFT.pdf"),width = 6)
 
 
 ##############################
-# Figure 2H
+# FSupplementary Table 3B
 # Cox PH time to first therapy from diagnosis by EScore + sex + age + Early WM status
 ##############################
 
@@ -406,10 +415,10 @@ b %>%
   kable_paper(full_width = FALSE) %>%
   column_spec(1,italic = TRUE) %>%
   column_spec(2,color=ifelse(b$estimate<0,"red","black")) %>%
-  as_image(file = file.path(outputDir,"Figures/Figure2/F2H_COXPH_DTFT.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST3_COXPH_DTFT.pdf"),width = 6)
 
 ##############################
-# Supplemental Table 4
+# Supplemental Table 5
 # Clinical associates between Early and Late EScore
 ##############################
 
@@ -424,14 +433,14 @@ ELClin[[1]] %>%
   column_spec(1,italic = T) %>%
   add_header_above(c("","Early EScore (N=147)"=3,"Late EScore (N=102)"=3,"","")) %>%
   row_spec(which(ELClin[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST4_EScore_Early_vs_Late_Clin1.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST5_EScore_Early_vs_Late_Clin1.pdf"),width = 6)
 
 ELClin[[2]] %>%
   kbl(col.names = c("Early EScore (N=147)","Late EScore (N=102)","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(ELClin[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST4_EScore_Early_vs_Late_Clin2.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST5_EScore_Early_vs_Late_Clin2.pdf"),width = 6)
 
 
 save(dmapDpt,file=file.path(dataDir,"studyDmap.RData"))
