@@ -223,7 +223,7 @@ BCL6qEnrichment %>%
   kbl() %>%
   kable_paper(full_width=FALSE) %>%
   row_spec(which(BCL6qEnrichment$Cytoband %in% PCL6qEnrichment$Cytoband), background = "lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/sFigure4/sF4A_chr6qSig_BCL.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/SFigure4/sF4A_chr6qSig_BCL.pdf"),width = 6)
 
 
 ##############################
@@ -236,7 +236,7 @@ PCL6qEnrichment %>%
   kbl() %>%
   kable_paper(full_width=FALSE) %>%
   row_spec(which(PCL6qEnrichment$Cytoband %in% BCL6qEnrichment$Cytoband), background = "lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/sFigure4/sF4B_chr6qSig_PCL.pdf"),width=6)
+  as_image(file = file.path(outputDir,"Figures/SFigure4/sF4B_chr6qSig_PCL.pdf"),width=6)
 
 
 ##############################
