@@ -16,7 +16,7 @@ library(kableExtra)
 #
 # This R Script includes code used to generate:
 #   Figure panel 1
-#   Supplemental Tables 1-3
+#   Supplemental Tables 1, 2 and 4
 #
 # Special note - Uses r package bvt for plotting
 # Bioconductor visualization tools (bvt) is available at https://github.com/ZachHunter/bvt
@@ -125,7 +125,9 @@ ClinTest<-function(groupA,groupB) {
 
 # Filtering to include MYD88 mutated samples only and restrict genes to of interest
 MYD88tsb<-as.character(unique(unlist(MAF@data[MAF@data$SYMBOL=="MYD88" & MAF@data$HGVSp_Short=="p.L273P","Tumor_Sample_Barcode"])))
+MYD88tsb<-MYD88tsb[gsub("_Tumor","",MYD88tsb) %in% sampleNames(studyTpM)]
 MYD88MAF<-subsetMaf(MAF, tsb=MYD88tsb)
+
 pdf(file=file.path(outputDir,"Figures/Figure1/F1A_Oncoplot.pdf"), width = 10, height = 5)
 oncoplot(MYD88MAF, genes=c("MYD88","CD79B","CXCR4","ARID1A","BIRC3","EP300","BTG2","H1-4","TRAF2","CTBP1","NOTCH1","TP53","NDUFA7", "NOTCH2", "TNFAIP3"))
 dev.off()
@@ -181,7 +183,7 @@ dev.off()
 # Includes creation of supplemental table 1
 ##############################
 
-# Selecting data for heatmap of top 120 PC1 genes
+# ing data for heatmap of top 120 PC1 genes
 CXCR4HeatGenes<-CXCR4prcomp$rotation[order(abs(CXCR4prcomp$rotation[,1]),decreasing = TRUE),1][1:120]
 
 # Note we are capturing the return value here so we can use cuttree to define the groups later
@@ -217,7 +219,7 @@ exprs(studyTpM)[names(CXCR4HeatGenes),] %>%
   pivot_longer(cols=-1,names_to = "ID",values_to = "Median TpM") %>%
   pivot_wider(id_cols = ID,names_from = Subtype,values_from = "Median TpM") %>%
   mutate("Symbol"=fData(studyTpM)[ID,"GeneSymbol"]) %>%
-  select(ID,Symbol,"HD CD19+CD27-"=HDPB,"HD CD19+CD27+"=HDMB,"Early WM","BCL","PCL") %>%
+  dplyr::select(ID,Symbol,"HD CD19+CD27-"=HDPB,"HD CD19+CD27+"=HDMB,"Early WM","BCL","PCL") %>%
   kbl(digits = 2,caption="Genes used in subtype identification by hierarchical clustering") %>%
   kable_classic() %>%
   column_spec(1,italic =TRUE) %>%
@@ -283,13 +285,18 @@ ggsurvplot(
   risk.table=T,
   xlab="Time (Years)",
   palette =SubtypeTheme$plotColors$fill,
-  conf.int = T)
+  conf.int = T,
+  fontsize=7,
+  legend.labs=c("Early WM", "BLC", "PCL"),
+  tables.height=0.3,
+  legend.title="WM Subtype", pval.size = 8,
+  font.x=18,font.y=18,font.legend=18, font.tickslab=14)
 dev.off()
 
 
 
 ##############################
-# Supplemental Tables 2-3
+# Supplemental Tables 2 and 4
 # Clinical Characteristics of Early WM
 # Clinical Comparison of BCL vs. PCL
 ##############################
@@ -325,14 +332,14 @@ BCLvPCL[[1]] %>%
   column_spec(1,italic = T) %>%
   add_header_above(c("","BCL Subtyped WM (N=86)"=3,"PCL Subtyped WM (N=97)"=3,"","")) %>%
   row_spec(which(BCLvPCL[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin1.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST4_BCL_vs_PCL_Clin1.pdf"),width = 6)
 
 BCLvPCL[[2]] %>%
   kbl(col.names = c("BCL Subtyped WM (N=86)","PCL Subtyped WM (N=97)","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(BCLvPCL[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST3_BCL_vs_PCL_Clin2.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST4_BCL_vs_PCL_Clin2.pdf"),width = 6)
 
 
 ClinTest(EWM,PCL)
