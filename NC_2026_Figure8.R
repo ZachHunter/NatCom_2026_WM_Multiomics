@@ -7,6 +7,7 @@ library(maftools)
 library(emmeans)
 library(lmtest)
 library(sandwich)
+library(kableExtra)
 
 #============================#
 # The Evolution and Subtypes of Waldenstrom Macroglobulinemia:
