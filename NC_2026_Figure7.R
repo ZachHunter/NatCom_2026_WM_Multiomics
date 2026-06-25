@@ -291,24 +291,6 @@ genePlot(studyTpM[,MYD88$ID], "S100A9",
          main="",RSOverride=TRUE)
 dev.off()
 
-# Testing the impact of high purity (MYD88 VAF=.4-.6) on S100A9 expression
-# while controlling for EScore (continuous) or EScore Level (discrete)
-
-S100A9Data<-data.frame(
-  S100A9=log(exprs(studyTpM)[fData(studyTpM)$GeneSymbol=="S100A9",names(HighP)] +1 ,2),
-  HighP,
-  EScore=pData(studyTpM)[names(HighP),"EScore"],
-  ESLevel=pData(studyTpM)[names(HighP),"EScore_5W"])
-
-S100.lm<-lm(S100A9 ~ HighP + EScore, data=S100A9Data)
-anova(S100.lm)
-emmeans(S100.lm, pairwise ~ HighP)
-
-S100.lm2<-lm(S100A9 ~ HighP + ESLevel, data=S100A9Data)
-anova(S100.lm2)
-emmeans(S100.lm2, pairwise ~ HighP)
-emmeans(S100.lm2, pairwise ~ ESLevel)
-
 # Testing S100A9 by Early/Late EScore within high purity group (MYD88 VAF .4-.6)
 wilcox.test(exprs(studyTpM)[rownames(fData(studyTpM))[fData(studyTpM)$GeneSymbol=="S100A9"],WMOnly] ~ pData(studyTpM)[WMOnly,"EScore_EL"])
 
