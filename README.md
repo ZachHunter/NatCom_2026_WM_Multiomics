@@ -9,31 +9,34 @@ Each file generates the associated main figure panel in addition to related supp
 - **NC_2026_Figure1.R:** *Identification of WM Subtypes*
   - Supplementary Table 1: *List of heatmap genes used to indentify WM subtypes*
   - Supplementary Table 2: *Clinical associations with Early WM and subtyped WM (BCL/PCL)*
-  - Supplementary Table 3: *Clinical associations with BCL and PCL subtyped WM*
+  - Supplementary Table 4: *Clinical associations with BCL and PCL subtyped WM*
 - **NC_2026_Figure2.R:** *Identification of the WM Evolutionary Score*
   - Supplementary Figure 1: *Exploring EScore and WM Subtype*
-  - Supplementary Table 4: *Signature genes for EScore and WM Subtype from NMF analysis*
-  - Supplementary Table 5: *Clinical associations with Early and Late EScore*
+  - Supplementary Table 3: *Coxph analysis of EScore time to first therapy*
+  - Supplementary Table 5: *Signature genes for EScore and WM Subtype from NMF analysis*
+  - Supplementary Table 6: *Clinical associations with Early and Late EScore*
 - **NC_2026_Figure3.R:** *Clinical associations and external validation of Subtype and EScore*
+  - Supplementary Figure 2: *BCL and PCL signature gene co-expression in Early WM*
 - **NC_2026_Figure4.R:** *Subtype signature gene expression and validation*
-  - Supplementary Figure 2: *WM subtype gene expression*
+  - Supplementary Figure 4: *Expression of WM Subtype genes in immune cells*
   - BCL versus PCL differential gene expression analysis
 - **NC_2026_Figure5.R:** *Characterization of the BCL and PCL WM subtypes*
-  - Supplementary Figure 3: *Confirmation of WM Subtype findings*
-  - Supplementary Table 6: *Clinical associations with EBCL and BCL subtyped WM*
-  - Supplementary Table 7: *Clinical associations with EPCL and PCL subtyped WM*
-  - Supplementary Table 8: *First therapy received by WM subtype*
-  - Supplementary Table 9: *Type of first therapy received by WM subtype*
+  - Supplementary Figure 4: *Confirmation of WM Subtype findings*
+  - Supplementary Table 7: *Clinical associations with EBCL and BCL subtyped WM*
+  - Supplementary Table 8: *Clinical associations with EPCL and PCL subtyped WM*
+  - Supplementary Table 9: *First therapy received by WM subtype*
+  - Supplementary Table 10: *Type of first therapy received by WM subtype*
   - EBCL versus BCL differential gene expression analysis
   - EPCL versus PCL differential gene expression analysis
 - **NC_2026_Figure6.R:** *Characterization of the WM EScore*
-  - Supplementary Figure 4: *Analysis of the WM EScore*
+  - Supplementary Figure 5: *Analysis of the WM EScore*
   - Early versus Late EScore differential gene expression analysis
   - EScore GAM differential gene expression analysis
 - **NC_2026_Figure7.R:** *Non-B lineage gene expression in early EScore WM*
 - **NC_2026_Figure8.R:** *Validation of non-B lineage expression in early EScore WM*
+  - Supplementary Table 11: *Statistical analysis of the impact of MYD88 VAF on EScore signature gene expression*
 - **NC_2026_Figure9.R:** *EScore validation studies*
-  - Supplementary Figure 5: *Additional supportive data for EScore validation*
+  - Supplementary Figure 6: *Additional supportive data for EScore validation*
 - **NC_2026_Figure10.R:** *Clinical significance of the WM EScore*
 
 ## Data Availability
