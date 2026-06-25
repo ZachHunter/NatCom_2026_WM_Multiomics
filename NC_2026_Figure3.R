@@ -14,6 +14,7 @@ library(GEOquery)
 #
 # This R Script includes code used to generate:
 #   Figure panel 3
+#   Supplementary figure panel 2
 #
 # Special note - Uses r package bvt for plotting
 # Bioconductor visualization tools (bvt) is available at https://github.com/ZachHunter/bvt
@@ -105,7 +106,8 @@ genePlot(pData(studyTpM)[WMOnly,"bm"],
          axisText=c("","%"),
          legendSize=1.2, main="",
          groupLabSize=1.3,
-         axisLabelSize=1.4,
+         axisLabelSize=1.5,
+         yAxisLabSize=1.15,
          ylab="WM LPC Bone Marrow Involvement",
          theme=SubtypeTheme,
          RSOverride=TRUE)
@@ -159,7 +161,7 @@ a<-xtabs(~ preTherapyMarrow + pData(studyTpM)$EScoreEL)[,3:4]
 fisher.test(a)
 a<-as.data.frame(round(a/rowSums(a)*100,1))
 
-pdf(file=file.path(outputDir,"Figures/Figure3/F3C_EScore12W.pdf"), width = 7, height = 6)
+pdf(file=file.path(outputDir,"Figures/Figure3/F3C_EScore12W.png"), width = 7, height = 6)
 genePlot(a$Freq,
          group=a$preTherapyMarrow,
          subgroup=a$pData.studyTpM..EScoreEL,
@@ -205,12 +207,15 @@ ImputedSubtype[ImputedSubtype==2]<-"BCL"
 ImputedSubtype<-factor(ImputedSubtype, levels=c("IgM MGUS", "BCL","PCL"))
 pData(MGUSvWM)$Subtype<-ImputedSubtype
 
+WMSigData<- data.frame(
+  Subtype=MGUSvWM_BCL-MGUSvWM_PCL,
+  EScore=-MGUSvWM_EScore)
+
 # Ploting data
 pdf(file=file.path(outputDir,"Figures/Figure3/F3D_GEO_Validation.pdf"), width = 8, height = 6)
+
 geneScatter(
-  data.frame(
-    Subtype=MGUSvWM_BCL-MGUSvWM_PCL,
-    EScore=-MGUSvWM_EScore),
+  WMSigData,
   color=pData(MGUSvWM)[,"diagnosis:ch1"],
   shape=ImputedSubtype,
   legend=c("Sample Type", "Imputed Subtype"),
@@ -263,4 +268,137 @@ genePlot(MGUSvWM_BCL-MGUSvWM_PCL,
          RSOverride=TRUE)
 dev.off()
 
+pairwise.wilcox.test(WMSigData$Subtype, ImputedSubtype)
 
+##############################
+# Supplemental Figure 2A
+# Signature genes by subtype and CXCR4 status
+##############################
+
+pdf(file=file.path(outputDir,"Figures/SFigure2/SF2A_SubtypeCXCR4.pdf"), width = 9, height = 5)
+genePlot(
+  studyTpM[,WMOnly],
+  gene = c("WNK2","DUSP22","GPER1","CABLES1"),
+  group="CXCR4",
+  highlight="SimpleSubtype",
+  logScale=2,
+  legendSize=1.1,
+  guides=TRUE,
+  lWidth=2,
+  plotColors=list(lines=setAlpha("black",.8),fill="white"),
+  errorBarLineType=1,
+  pointSize=.65,
+  theme=SubtypeTheme,
+  ylab="Transcripts per Million + 1 (Log 2)",
+  groupLabelSpacing=1.2,
+  subgroupLabSize=.75,
+  main="",
+  RSOverride=TRUE)
+dev.off()
+
+##############################
+# Supplementary Figure 2B
+# Scatter plot of WNK2 and KLF14 by WM Subtype
+# Note that we are using VST here to help with relative scaling
+# Neither gene is expressed in B-cells or in the BM enviroment generally
+##############################
+
+pdf(file=file.path(outputDir,"Figures/SFigure2/SF2B_WNK2_KLF14.pdf"), width = 8, height = 6)
+geneScatter(
+  studyVST,
+  c("KLF14","WNK2"),
+  color="SimpleSubtype",
+  size=round(pData(studyTpM)$EScore,3),
+  legend=c("WM Subtype","EScore"),
+  legendSize=1.2,
+  main="",
+  pointSize=1,
+  sizeScale=2.3,
+  legendSpacing=.3,
+  xlab="KLF14 (VST)",
+  ylab="WNK2 (VST)",
+  theme=SubtypeTheme,
+  yAxisLabSize=1.1,
+  RSOverride=TRUE)
+dev.off()
+
+##############################
+# Supplementary Figure 2C
+# Scatter plot of GRIK3 and PRDM5 by WM Subtype
+# Note that we are using VST here to help with relative scaling
+# Neither gene is expressed in B-cells or in the BM environment generally
+##############################
+
+pdf(file=file.path(outputDir,"Figures/SFigure2/SF2C_PRDM5_GRIK3.pdf"), width = 8, height = 6)
+geneScatter(
+  studyVST,
+  c("GRIK3","PRDM5"),
+  color="SimpleSubtype",
+  size=round(pData(studyTpM)$EScore,3),
+  legend=c("WM Subtype","EScore"),
+  legendSize=1.2,
+  main="",
+  pointSize=1,
+  sizeScale=2.3,
+  legendSpacing=.3,
+  xlab="GRIK3 (VST)",
+  ylab="PRDM5 (VST)",
+  theme=SubtypeTheme,
+  yAxisLabSize=1.1,
+  RSOverride=TRUE)
+dev.off()
+
+##############################
+# Supplementary Figure 2D
+# Identification of Early WM Samples in Trojani et al data set
+##############################
+
+TrojaniSubtype<-rep("PCL",nrow(WMSigData))
+TrojaniSubtype[MGUSvWM_BCL-MGUSvWM_PCL>0]<-"BCL"
+#Note EScore is plotted is defined here as -MGUSvWM_EScore
+#This is to make it increase with disease progression like the RNASeq DPT
+TrojaniSubtype[MGUSvWM_EScore > 20]<-"Early WM"
+TrojaniSubtype<-factor(TrojaniSubtype, levels=c("Early WM","BCL","PCL"))
+
+pdf(file=file.path(outputDir,"Figures/SFigure2/SF2D_Trojani_Subtype.pdf"), width = 8, height = 6)
+geneScatter(
+  WMSigData,
+  color=TrojaniSubtype,
+  shape=TrojaniSubtype,
+  legend="WM Subtype",
+  legendSize=1,
+  main="",
+  pointSize=1.2,
+  legendSpacing=.5,
+  ylab="EScore Signature Score",
+  xlab="Subtype Signature Score",
+  theme=SubtypeTheme,
+  yAxisLabSize=1.1,
+  RSOverride=TRUE)
+dev.off()
+
+##############################
+# Supplementary Figure 2E
+# Documenting intermediate levels of BCL, PCL and Subtype gene signature
+# scores in Early WM compared with the mature BCL and PCL subtypes shown
+# this time in the Trojani et al data set.
+##############################
+
+pdf(file=file.path(outputDir,"Figures/SFigure2/SF2E_Trojani_SubtypeScoreLevels.pdf"), width = 8, height = 6)
+genePlot(data.frame(MGUSvWM_BCL,MGUSvWM_PCL,MGUSvWM_BCL-MGUSvWM_PCL),
+         group=TrojaniSubtype,
+         theme=SubtypeTheme,
+         ylab="Scaled Score",
+         main="",legend=TRUE,
+         groupLabSize=1.4,
+         axisLabelSize=1.5,
+         yAxisLabSize=1.15,
+         legendSize=1.3,
+         groupLabels=c("BCL Score","PCL Score", "Subtype Score"),
+         RSOverride=TRUE)
+dev.off()
+
+# Pairwise testing by subtype
+pairwise.wilcox.test(MGUSvWM_BCL,TrojaniSubtype)
+pairwise.wilcox.test(MGUSvWM_PCL,TrojaniSubtype)
+pairwise.wilcox.test(MGUSvWM_BCL-MGUSvWM_PCL,TrojaniSubtype)
