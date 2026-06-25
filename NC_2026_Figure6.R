@@ -15,8 +15,9 @@ library(kableExtra)
 #
 # This R Script includes code used to generate:
 #   Figure panel 6
-#   Supplemental Figure panel 4
+#   Supplemental Figure panel 5
 #   Early/Late EScore DGE data
+#.  EScore GAM Analysis
 #
 # Special note - Uses r package bvt for plotting
 # Bioconductor visualization tools (bvt) is available at https://github.com/ZachHunter/bvt
@@ -109,7 +110,7 @@ camera(v, study_mSig[[1]], design = EScoreMod, contrast = EScoreCon) %>%
 
 ##############################
 # Figure 6B
-# Barcode plot for HALLMARK Inflamtoary Response with EScore
+# Barcode plot for HALLMARK Inflammatory Response with EScore
 ##############################
 
 pdf(file=file.path(outputDir,"Figures/Figure6/F6B_EScore_CameraIndex_Inflamatory.pdf"), width = 8, height = 4)
@@ -123,37 +124,7 @@ dev.off()
 
 
 ##############################
-# Supplemental Figure 4A
-# S100A9 Correlation with EScore
-##############################
-
-# Calculating the stats ahead of plotting
-a<-geneScatter(
-  data.frame(
-    EScore=colData(studyVST)[WMOnly,"EScore"],
-    S100A9=assay(studyVST)[featureNames(studyTpM)[fData(studyTpM)$GeneSymbol=="S100A9"],WMOnly]),
-  trendline=TRUE)
-
-pdf(file=file.path(outputDir,"Figures/SFigure4/SF4A_S100A9_by_EScore.pdf"), width = 8, height = 7)
-geneScatter(
-  data.frame(
-    EScore=colData(studyVST)[WMOnly,"EScore"],
-    S100A9=assay(studyVST)[featureNames(studyTpM)[fData(studyTpM)$GeneSymbol=="S100A9"],WMOnly]),
-  trendline=TRUE,
-  color=colData(studyVST)[WMOnly,"SimpleSubtype"],
-  size=colData(studyVST)[WMOnly,"bm"],
-  legend=c("WM Subtype","WM BM Involvement (%)"),
-  legendSize=1.1,
-  RSOverride=TRUE,
-  logScale=c(FALSE,2),
-  ylab="S100A9 (VST Expression)",
-  sub=paste0("Pearson's r=",round(a$stats$cor$estimate,4),"; p-value=",format.pval(a$stats$cor$p.value)),
-  main="")
-dev.off()
-
-
-##############################
-# Supplemental Figure 4B
+# Supplemental Figure 5A
 # GAM Analysis of EScore
 # Includes GAM DGE data generation
 ##############################
@@ -200,23 +171,34 @@ gamResults<-gamResults[order(NparamP[names(gamResults)])]
 # Location in gamResults list for MYD8 and IL17RA (6 and 34)
 MYD88loc<-which(gamResults=="MYD88")
 IL17RAloc<-which(gamResults=="IL17RA")
+CD20loc<-which(gamResults=="MS4A1")
+CD19loc<-which(gamResults=="CD19")
 
-# Plotting IL17RA comparing GAM and LM models
-pdf(file=file.path(outputDir,"Figures/SFigure4/SF4B_GAM_IL17RA.pdf"), width = 8, height = 7)
+# Plotting CD20 comparing GAM and LM models
+pdf(file=file.path(outputDir,"Figures/SFigure5/SF5A_GAM_CD20.pdf"), width = 8, height = 7)
 data.frame(EScore=pData(studyTpM)[colnames(GenesToTest),c("EScore")],
-           IL17RA=assay(studyVST)[names(gamResults)[IL17RAloc],colnames(GenesToTest)],
+           CD20=assay(studyVST)[names(gamResults)[CD20loc],colnames(GenesToTest)],
            Subtype=pData(studyTpM[,colnames(GenesToTest)])$SimpleSubtype,
            EScore_Level=pData(studyTpM[,colnames(GenesToTest)])$EScore_EL) %>%
-  ggplot(aes(x=EScore,y=IL17RA )) +
+  ggplot(aes(x=EScore,y=CD20 )) +
   geom_point(aes(color=EScore_Level, shape=Subtype)) +
   geom_smooth(method = "gam") +
   geom_smooth(method="lm", color="red") +
-  ggtitle("VST IL17RA Expression with DPT Shows Non-Linear Effects",
-          subtitle=paste0("Model RSS: ",round(lmVgam[[names(gamResults)[IL17RAloc]]][1,2],3), " (linear); ",round(lmVgam[[names(gamResults)[IL17RAloc]]][2,2],3)," (Spline); p-value: ", formatC(lmVgam[[names(gamResults)[IL17RAloc]]][2,6], format = "e", digits = 3)))
+  theme(axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size = 16),
+        plot.subtitle = element_text(size = 14)) +
+  ggtitle("VST MS4A1 (CD20) Expression with DPT Shows Non-Linear Effects",
+          subtitle=paste0("Model RSS: ",
+                          round(lmVgam[[names(gamResults)[CD20loc]]][1,2],3),
+                          " (linear); ",
+                          round(lmVgam[[names(gamResults)[CD20loc]]][2,2],3),
+                          " (Spline); p-value: ",
+                          formatC(lmVgam[[names(gamResults)[CD20loc]]][2,6], format = "e", digits = 3)))
 dev.off()
 
 # Plotting MYD88 comparing GAM and LM models
-pdf(file=file.path(outputDir,"Figures/SFigure4/SF4B_GAM_MYD88.pdf"), width = 8, height = 7)
+pdf(file=file.path(outputDir,"Figures/SFigure5/SF5A_GAM_MYD88.pdf"), width = 8, height = 7)
 data.frame(EScore=pData(studyTpM)[colnames(GenesToTest),c("EScore")],
            MYD88=assay(studyVST)[names(gamResults)[MYD88loc],colnames(GenesToTest)],
            Subtype=pData(studyTpM[,colnames(GenesToTest)])$SimpleSubtype,
@@ -225,8 +207,17 @@ data.frame(EScore=pData(studyTpM)[colnames(GenesToTest),c("EScore")],
   geom_point(aes(color=EScore_Level, shape=Subtype)) +
   geom_smooth(method = "gam") +
   geom_smooth(method="lm", color="red") +
+  theme(axis.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size = 16),
+        plot.subtitle = element_text(size = 14)) +
   ggtitle("VST MYD88 Expression with DPT Shows Non-Linear Effects",
-          subtitle=paste0("Model RSS: ",round(lmVgam[[names(gamResults)[MYD88loc]]][1,2],3), " (linear); ",round(lmVgam[[names(gamResults)[MYD88loc]]][2,2],3)," (Spline); p-value: ", formatC(lmVgam[[names(gamResults)[MYD88loc]]][2,6], format = "e", digits = 3)))
+          subtitle=paste0("Model RSS: ",
+                          round(lmVgam[[names(gamResults)[MYD88loc]]][1,2],3),
+                          " (linear); ",
+                          round(lmVgam[[names(gamResults)[MYD88loc]]][2,2],3),
+                          " (Spline); p-value: ",
+                          formatC(lmVgam[[names(gamResults)[MYD88loc]]][2,6], format = "e", digits = 3)))
 dev.off()
 
 # Writing top 500 GAM results not found in limma DGE
@@ -244,14 +235,44 @@ write.table(gamResultTable,sep="\t",quote=FALSE,file=file.path(outputDir,"DGE/GA
 
 
 ##############################
-# Supplemental Figure 4C
+# Supplemental Figure 5B
+# S100A9 Correlation with EScore
+##############################
+
+# Calculating the stats ahead of plotting
+a<-geneScatter(
+  data.frame(
+    EScore=colData(studyVST)[WMOnly,"EScore"],
+    S100A9=assay(studyVST)[featureNames(studyTpM)[fData(studyTpM)$GeneSymbol=="S100A9"],WMOnly]),
+  trendline=TRUE)
+
+pdf(file=file.path(outputDir,"Figures/SFigure5/SF5B_S100A9_by_EScore.pdf"), width = 8, height = 7)
+geneScatter(
+  data.frame(
+    EScore=colData(studyVST)[WMOnly,"EScore"],
+    S100A9=assay(studyVST)[featureNames(studyTpM)[fData(studyTpM)$GeneSymbol=="S100A9"],WMOnly]),
+  trendline=TRUE,
+  color=colData(studyVST)[WMOnly,"SimpleSubtype"],
+  size=colData(studyVST)[WMOnly,"bm"],
+  legend=c("WM Subtype","WM BM Involvement (%)"),
+  legendSize=1.1,
+  RSOverride=TRUE,
+  logScale=c(FALSE,2),
+  ylab="S100A9 (VST Expression)",
+  sub=paste0("Pearson's r=",round(a$stats$cor$estimate,4),"; p-value=",format.pval(a$stats$cor$p.value)),
+  main="")
+dev.off()
+
+
+##############################
+# Supplemental Figure 5C
 # Derivation of the 5 EScore levels
 ##############################
 
 # Since EScore is fairly continuous, its hard to know how best group values
 # The DPT space captures many of the features seen in DC1/2 while collapsing BCL/PCL differences
 # Combining DPT1/2 with EScore allows k-means to select cut offs that reflect both spaces
-# We will then use this clustering solutoin to select hard EScore cut offs.
+# We will then use this clustering solution to select hard EScore cut offs.
 EScore_KM<-kmeans(
   data.frame(
     dmapDpt$DPT1,
@@ -278,13 +299,13 @@ EScore_5W<-factor(EScore_5W,levels=c("ESL1","ESL2","ESL3","ESL4","ESL5"))
 
 # Plotting initial clustering solution
 # Note that this mostly, but not perfectly corresponds to EScore
-pdf(file=file.path(outputDir,"Figures/SFigure4/SF4C_EScore_Cutoffs.pdf"), width = 8, height = 7)
+pdf(file=file.path(outputDir,"Figures/SFigure5/SF5C_EScore_Cutoffs.pdf"), width = 8, height = 7)
 geneScatter(sort(pData(studyTpM)[WMOnly,"EScore"],decreasing = F),
             color=EScore_5W[order(pData(studyTpM)[WMOnly,"EScore"],decreasing = F)],
             type="p",
             ylab="WM Evolutionary Score (EScore)",
             main="",xlab="WM Samples",
-            legend="K-means Level",legendSize=1.1,
+            legend="K-means Level",legendSize=1.2,
             RSOverride=TRUE)
 
 # Assigning hard cut offs fro EScore based on results
@@ -306,17 +327,17 @@ EScore_5W[pData(studyTpM)[WMOnly,"EScore"]>=EScore_Cutoffs[4] & pData(studyTpM)[
 
 
 ##############################
-# Supplemental Figure 4D
+# Supplemental Figure 5D
 # Diffusion Map with EScore Level, Subtype and BM
 ##############################
 
-pdf(file=file.path(outputDir,"Figures/SFigure4/SF4D_dmap_EScore_Levels_Subtype.pdf"), width = 9, height = 7)
+pdf(file=file.path(outputDir,"Figures/SFigure5/SF5D_dmap_EScore_Levels_Subtype.pdf"), width = 9, height = 7)
 geneScatter(data.frame(DC1=dmapDpt$DC1,DC2=dmapDpt$DC2),
             color=EScore_5W,size=pData(studyTpM)[WMOnly,"bm"],
             shape=pData(studyTpM)[WMOnly,"SimpleSubtype"],
             legend=c("EScore Level","WM Subtype","WM BM Involvement (%)"),
             main="",
-            legendSize=1.1,
+            legendSize=1.2,
             RSOverride=TRUE)
 dev.off()
 
