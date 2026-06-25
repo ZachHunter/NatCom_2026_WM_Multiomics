@@ -19,9 +19,9 @@ library(umap)
 #
 # This R Script includes code used to generate:
 #   Figure panel 5
-#   Supplemental Figure panel 3
+#   Supplemental Figure panel 4
 #   EBCL and EPCL DGE data
-#   Supplemental Tables 6-7
+#   Supplemental Tables 7-10
 #
 # Special note - Uses r package bvt for plotting
 # Bioconductor visualization tools (bvt) is available at https://github.com/ZachHunter/bvt
@@ -172,7 +172,7 @@ dev.off()
 
 
 ##############################
-# Supplemental Figures 3A
+# Supplemental Figures 4A
 # Positional GSEA based on chr6q deletions status in BCL
 ##############################
 
@@ -223,11 +223,11 @@ BCL6qEnrichment %>%
   kbl() %>%
   kable_paper(full_width=FALSE) %>%
   row_spec(which(BCL6qEnrichment$Cytoband %in% PCL6qEnrichment$Cytoband), background = "lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/sFigure3/sF3A_chr6qSig_BCL.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/sFigure4/sF4A_chr6qSig_BCL.pdf"),width = 6)
 
 
 ##############################
-# Supplemental Figures 3B
+# Supplemental Figures 4B
 # Positional GSEA based on chr6q deletions status in PCL
 ##############################
 
@@ -236,7 +236,7 @@ PCL6qEnrichment %>%
   kbl() %>%
   kable_paper(full_width=FALSE) %>%
   row_spec(which(PCL6qEnrichment$Cytoband %in% BCL6qEnrichment$Cytoband), background = "lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/sFigure3/sF3B_chr6qSig_PCL.pdf"),width=6)
+  as_image(file = file.path(outputDir,"Figures/sFigure4/sF4B_chr6qSig_PCL.pdf"),width=6)
 
 
 ##############################
@@ -443,8 +443,8 @@ dev.off()
 
 
 ##############################
-# Figure 5D
-# Supplementary tables 6-7
+# Supplementary tables 7-8
+# Clinical characteristics of EBCL and EPCL
 ##############################
 
 # Running clinical association testing between EBCL and BCL as well as EPCL and PCL
@@ -457,14 +457,14 @@ BCEvBCL_Clin[[1]] %>%
   column_spec(1,italic = T) %>%
   add_header_above(c("","Extreme BCL (N=12)"=3,"BCL (N=74)"=3,"","")) %>%
   row_spec(which(BCEvBCL_Clin[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST6_EBCL_vs_BCL_Clin1.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST7_EBCL_vs_BCL_Clin1.pdf"),width = 6)
 
 BCEvBCL_Clin[[2]] %>%
   kbl(col.names = c("Extreme BCL","BCL","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(BCEvBCL_Clin[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST6_EBCL_vs_BCL_Clin2.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST7_EBCL_vs_BCL_Clin2.pdf"),width = 6)
 
 PCEvPCL_Clin[[1]] %>%
   kbl(col.names = c(rep(c("median", "min", "max"),2),"p.value","adj.p.value")) %>%
@@ -472,18 +472,18 @@ PCEvPCL_Clin[[1]] %>%
   column_spec(1,italic = T) %>%
   add_header_above(c("","Extreme PCL (N=13)"=3,"PCL (N=84)"=3,"","")) %>%
   row_spec(which(PCEvPCL_Clin[[1]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST7_EPCL_vs_PCL_Clin1.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST8_EPCL_vs_PCL_Clin1.pdf"),width = 6)
 
 PCEvPCL_Clin[[2]] %>%
   kbl(col.names = c("Extreme PCL","PCL","p.value","adj.p.value")) %>%
   kable_paper() %>%
   column_spec(1,italic = T) %>%
   row_spec(which(PCEvPCL_Clin[[2]]$adj.p.value<0.05),background="lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST7_EPCL_vs_PCL_Clin2.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST8_EPCL_vs_PCL_Clin2.pdf"),width = 6)
 
 
 ##############################
-# Supplemental Figure S3E
+# Supplemental Figure S4E
 # linear model of BCL patient BM by EScore, CXCR4 status, gender, and EBCL status
 # Includes MAF analysis mentioned in text but not plotted
 ##############################
@@ -496,7 +496,7 @@ tidy(bmBceFit) %>%
   mutate(term=c("(Intercept)","EScore","CXCR4: Mutated","Sex: Male","Subtype: EBCL")) %>%
   kbl(caption="Linear Model of WM LPC BM Involvement in BCL and EBCL Subtyped Samples",digits = 5) %>%
   kable_classic() %>%
-  as_image(file=file.path(outputDir,"Figures/SFigure3/SF3E_BM_lm_EBCL.pdf"),width = 6)
+  as_image(file=file.path(outputDir,"Figures/SFigure4/SF4E_BM_lm_EBCL.pdf"),width = 6)
 
 # These are not plotted but are mentioned in the text
 BCEmaf<-subsetMaf(MAF,tsb=paste0(BCLsamps[pData(studyTpM)[BCLsamps,"ExpandedSubtype"]=="EBCL"],"_Tumor"),)
@@ -527,6 +527,10 @@ genePlot(studyTpM,c("XBP1","PRDM1","SDC1"),
          RSOverride=TRUE)
 dev.off()
 
+# Demonstrating CD138 (SDC1) overexpression in EPCL
+pairwise.wilcox.test(
+  exprs(studyTpM)[fData(studyTpM)$GeneSymbol=="SDC1",WMOnly],
+  factor(pData(studyTpM[,WMOnly])$ExpandedSubtype))
 
 ##############################
 # Supplemental Data
@@ -613,14 +617,18 @@ ggsurvplot(
   ylab="Progression Free Survival",
   risk.table=T,
   xlab="Time (Months)",
-  risk.table.height=.35,
-  title="Proteasome (BDR ,CARD,IDR)",
-  palette =ESubtypeTheme$plotColors$fill)
+  title="Proteasome Inhibitor Based Therapies (BDR, CARD, IDR)",
+  palette =ESubtypeTheme$plotColors$fill,
+  fontsize=7,
+  legend.labs=c("Early WM", "EBLC", "BCL", "PCL", "EPCL"),
+  tables.height=0.4,
+  legend.title="WM Subtype", pval.size = 8,
+  font.x=18,font.y=18,font.legend=18, font.tickslab=14)
 
 dev.off()
 
 ##############################
-# Supplementary Table 8
+# Supplementary Table 9
 # Table of first therapy received by WM subtype
 # Note that the paper versions of these tables were reformatted in Excel
 # to further improved clarity and compactness
@@ -635,11 +643,11 @@ kbl(a) %>%
   kable_classic() %>%
   column_spec(1,italic = TRUE) %>%
   row_spec(6,background = "lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST8_RX1_by_Subtype.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST9_RX1_by_Subtype.pdf"),width = 6)
 
 
 ##############################
-# Supplementary Table 9
+# Supplementary Table 10
 # Table of first type of therapy received by WM subtype
 # Note that the paper versions of these tables were reformatted in Excel
 # to further improved clarity and compactness
@@ -653,7 +661,7 @@ kbl(a) %>%
   kable_classic() %>%
   column_spec(1,italic = TRUE) %>%
   row_spec(6,background = "lightgrey") %>%
-  as_image(file = file.path(outputDir,"Figures/STables/ST9_RX1Type_by_Subtype.pdf"),width = 6)
+  as_image(file = file.path(outputDir,"Figures/STables/ST10_RX1Type_by_Subtype.pdf"),width = 6)
 
 
 save(studyCounts, file=file.path(dataDir,"studyCounts.RData"))
